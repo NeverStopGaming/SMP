@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModule",
+  "main": "net.derfarmer.playersystem.PlayerModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}

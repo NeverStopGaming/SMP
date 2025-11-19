@@ -1,0 +1,5 @@
+name: ModuleLoader
+version: '1.0-SNAPSHOT'
+main: net.derfarmer.moduleloader.ModuleLoader
+api-version: '1.21'
+folia-supported: true

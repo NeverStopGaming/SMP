@@ -1,0 +1,7 @@
+{
+  "name": "Utils",
+  "main": "net.derfarmer.utilmodule.UtilModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}
