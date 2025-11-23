@@ -20,14 +20,15 @@ import java.util.*
 
 object PlayerManager {
 
-    fun getPlayerValue(player: OfflinePlayer, key: String): String = Redis.db.hget("player_${player.uniqueId}", key)
-    fun setPlayerValue(player: OfflinePlayer, key: String, value: String): Long? = Redis.db.hset("player_${player.uniqueId}", key, value)
+    fun getPlayerValue(player: OfflinePlayer, key: String): String? = Redis.db.hget("player_${player.uniqueId}", key)
+    fun setPlayerValue(player: OfflinePlayer, key: String, value: String): Long? =
+        Redis.db.hset("player_${player.uniqueId}", key, value)
 
-    fun getClanName(player: Player): String = getPlayerValue(player, "clan")
+    fun getClanName(player: Player): String = getPlayerValue(player, "clan") ?: ""
     fun getClan(player: Player) = ClanManager.getClan(getClanName(player))
     private fun setClanName(player: Player, clanName: String) = setPlayerValue(player, "clan", clanName)
 
-    fun getBannedTime(player: Player): Long = getPlayerValue(player, "banned").toLong()
+    fun getBannedTime(player: Player): Long = (getPlayerValue(player, "banned") ?: "0").toLong()
     fun isBanned(player: Player): Boolean = getBannedTime(player) != 0L
     fun setBannedTime(player: Player, time: Long): Long? = setPlayerValue(player, "clan", time.toString())
 

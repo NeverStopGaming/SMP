@@ -20,8 +20,8 @@ import java.awt.Color
 
 object DiscordManager {
 
-    val jda : JDA
-    private val guild : Guild
+    val jda: JDA
+    private val guild: Guild
 
     init {
         val builder = JDABuilder.createDefault(DiscordConfig.token)
@@ -42,7 +42,7 @@ object DiscordManager {
         }) as Guild
     }
 
-    fun acceptRequest(minecraftName : String, member: Member) {
+    fun acceptRequest(minecraftName: String, member: Member) {
         val player = Bukkit.getOfflinePlayer(minecraftName)
         player.discordID = member.id
 
@@ -54,18 +54,22 @@ object DiscordManager {
             .addField("Server Version", "1.21.0", false)
             .setFooter("Bitte immer die neuste Version benutzen und halte dich an unser Regelwerk.")
 
-        member.user.openPrivateChannel().queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
+        member.user.openPrivateChannel()
+            .queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
     }
 
     fun denyRequest(member: Member) {
         val embed: EmbedBuilder = EmbedBuilder()
             .setColor(Color.RED)
             .setTitle("Dein Whitelist-Antrag wurde abgelehnt")
-            .setDescription("Leider wurde dein Antrag, der Whitelist beizutreten, abgelehnt." +
-                    "Wenn du Fragen hast, wende dich bitte an einen Administrator.")
+            .setDescription(
+                "Leider wurde dein Antrag, der Whitelist beizutreten, abgelehnt." +
+                        "Wenn du Fragen hast, wende dich bitte an einen Administrator."
+            )
             .setFooter("Vielen Dank für dein Verständnis")
 
-        member.user.openPrivateChannel().queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
+        member.user.openPrivateChannel()
+            .queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
     }
 
     fun minecraftAccountNotFound(message: Message) {
@@ -76,14 +80,15 @@ object DiscordManager {
             .setFooter("Vielen Dank für dein Verständnis")
 
         message.delete().queue()
-        message.member?.user?.openPrivateChannel()?.queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
+        message.member?.user?.openPrivateChannel()
+            ?.queue { privateChannel -> privateChannel.sendMessageEmbeds(embed.build()).queue() }
     }
 
-    var OfflinePlayer.discordID : String
+    var OfflinePlayer.discordID: String
         set(discordID) {
             PlayerManager.setPlayerValue(this, "discordID", discordID)
         }
         get() {
-            return PlayerManager.getPlayerValue(this, "discordID")
+            return PlayerManager.getPlayerValue(this, "discordID") ?: ""
         }
 }

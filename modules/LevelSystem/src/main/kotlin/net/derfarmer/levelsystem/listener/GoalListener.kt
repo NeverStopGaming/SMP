@@ -8,7 +8,7 @@ import org.bukkit.event.entity.EntityDeathEvent
 object GoalListener : Listener {
 
     @EventHandler
-    fun onEntityKill(e : EntityDeathEvent) {
+    fun onEntityKill(e: EntityDeathEvent) {
         if (e.damageSource !is Player) return
 
     }

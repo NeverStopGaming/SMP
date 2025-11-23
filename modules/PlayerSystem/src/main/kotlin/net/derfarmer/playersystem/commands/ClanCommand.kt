@@ -43,13 +43,22 @@ object ClanCommand : Command("clan") {
             return
         }
 
-        player.sendMSG("clan.info.header", clan.color, clan.name, clan.color, clan.tag, clan.members.size.toString())
+        player.sendMSG(
+            "clan.info.header",
+            clan.color,
+            clan.name,
+            clan.color,
+            clan.tag,
+            clan.color,
+            clan.members.size.toString()
+        )
         for (member in clan.members) {
             player.sendMSG(
                 "clan.info.member",
                 clan.color,
-                member.offlinePlayer().name.toString(),
-                Message[member.rank.msgKey].toString()
+                member.offlinePlayer().name ?: "ERROR",
+                Message.getRaw(member.rank.msgKey),
+                withPrefix = false
             )
         }
     }
@@ -196,7 +205,7 @@ object ClanCommand : Command("clan") {
     @CommandSubPath("promote <memberName>")
     fun promote(
         player: Player,
-        @CommandArgument("memeberName", PlayerCommandSuggestionProvider::class) memberName: String
+        @CommandArgument("memberName", PlayerCommandSuggestionProvider::class) memberName: String
     ) {
         val clan = PlayerManager.getClan(player) ?: run {
             player.sendMSG("clan.notInAClan")
@@ -231,7 +240,7 @@ object ClanCommand : Command("clan") {
 
         when (ClanManager.changeRank(player, target, newRank, clan)) {
             ClanManager.ClanResponse.NO_PERMISSION -> player.sendMSG("clan.notPermission")
-            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.colorChanged")
+            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.promoted", target.name)
             else -> player.sendMSG("error.internal")
         }
     }
@@ -239,7 +248,7 @@ object ClanCommand : Command("clan") {
     @CommandSubPath("demote <memberName>")
     fun demote(
         player: Player,
-        @CommandArgument("memeberName", PlayerCommandSuggestionProvider::class) memberName: String
+        @CommandArgument("memberName", PlayerCommandSuggestionProvider::class) memberName: String
     ) {
         val clan = PlayerManager.getClan(player) ?: run {
             player.sendMSG("clan.notInAClan")
@@ -273,7 +282,7 @@ object ClanCommand : Command("clan") {
 
         when (ClanManager.changeRank(player, target, newRank, clan)) {
             ClanManager.ClanResponse.NO_PERMISSION -> player.sendMSG("clan.notPermission")
-            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.colorChanged")
+            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.demoted", target.name)
             else -> player.sendMSG("error.internal")
         }
     }

@@ -6,8 +6,8 @@ import org.bukkit.entity.Player
 object Message {
 
     operator fun get(key: String, vararg args: String, withPrefix: Boolean = true): Component {
-        val msg = if (withPrefix) getRaw(key) + getRaw(key) else getRaw(key)
-        return mm.deserialize(msg.format(args))
+        val msg = if (withPrefix) getRaw("prefix") + getRaw(key) else getRaw(key)
+        return mm.deserialize(msg.format(*args))
     }
 
     fun getRaw(key: String): String {

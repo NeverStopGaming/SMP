@@ -22,9 +22,9 @@ object ClanManager {
 
         if (clanNameBlackList.contains(name) || name.length > 10 || name.length < 3) return NAME_INVAILD
 
-        if (Redis.db.get("clan_$name").isNotBlank()) return NAME_INVAILD
+        if ((Redis.db.get("clan_$name") ?: "").isNotBlank()) return NAME_INVAILD
 
-        if (Redis.db.hget("clantags", tag).isNotBlank() || tag.length > 10 || tag.length < 3) return TAG_INVAILD
+        if ((Redis.db.hget("clantags", tag) ?: "").isNotBlank() || tag.length > 10 || tag.length < 3) return TAG_INVAILD
 
         if (PlayerManager.getClanName(player).isNotBlank()) return ALREADY_IN_CLAN
 

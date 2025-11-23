@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 object JoinListener : Listener {
 
     @EventHandler
-    fun onJoin(event : PlayerJoinEvent) {
+    fun onJoin(event: PlayerJoinEvent) {
         if (!DiscordConfig.whitelistEnabled) return
         if (event.player.discordID.isNotBlank()) return
 

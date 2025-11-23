@@ -20,7 +20,7 @@ object DiscordListener : ListenerAdapter() {
         if (event.channel.id == whitelistChannel.id) return
 
         val message = event.message
-        if (Bukkit.getOfflinePlayer(message.contentRaw).name == null){
+        if (Bukkit.getOfflinePlayer(message.contentRaw).name == null) {
             DiscordManager.minecraftAccountNotFound(message)
             return
         }
