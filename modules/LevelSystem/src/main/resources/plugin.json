@@ -1,0 +1,7 @@
+{
+  "name": "ModuleManager",
+  "main": "net.derfarmer.modulemanager.ModuleManager",
+  "authors": [
+    "DerFarmer"
+  ]
+}
