@@ -1,4 +1,4 @@
-package net.derfarmer.modulemanager
+package net.derfarmer.utilmodule.commands
 
 import net.derfarmer.moduleloader.Message
 import net.derfarmer.moduleloader.commands.Command

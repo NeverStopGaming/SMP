@@ -22,7 +22,6 @@ plugins {
 include(":plugin")
 
 rootProject.name = "SMP"
-include("modules:ModuleManager")
 include("modules:PlayerSystem")
 include("modules:UtilModule")
 include("modules:DiscordModule")

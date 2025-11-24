@@ -1,10 +1,10 @@
-package net.derfarmer.modulemanager
+package net.derfarmer.moduleloader.modules
 
 import net.derfarmer.moduleloader.commands.Command
+import net.derfarmer.moduleloader.commands.CommandManager
 import net.derfarmer.moduleloader.commands.annotations.CommandArgument
 import net.derfarmer.moduleloader.commands.annotations.CommandSubPath
 import net.derfarmer.moduleloader.commands.provider.CommandSuggestionProvider
-import net.derfarmer.moduleloader.modules.ModuleManager
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.io.File
@@ -21,7 +21,7 @@ object ModuleCommand : Command("modules") {
 
     @CommandSubPath("reload", permission = "module.reload")
     fun handleReload(player: Player) {
-        ModuleManager.reloadAllModules()
+        ModuleManager.reloadModules()
         player.sendMessage(Component.text("[Modules] All Modules were reloaded."))
     }
 
@@ -37,10 +37,17 @@ object ModuleCommand : Command("modules") {
             return
         }
 
-        ModuleManager.reloadModule(module)
+        ModuleManager.reloadModules()
         player.sendMessage(Component.text("[Modules] Module \"$moduleName\" was reloaded."))
     }
 
+    @CommandSubPath("disable", permission = "module.disable")
+    fun handleDisable(
+        player: Player,
+    ) {
+        ModuleManager.disableAllModules()
+        player.sendMessage(Component.text("[Modules] all Modules disabled."))
+    }
 
     @CommandSubPath("disable <moduleName>", permission = "module.disable")
     fun handleDisable(
@@ -73,7 +80,7 @@ object ModuleCommand : Command("modules") {
             return
         }
 
-        ModuleManager.loadModuleFromFile(file)
+        ModuleManager.loadModulesFromFiles()
         player.sendMessage(Component.text("[Modules] File \"$fileName\" was loaded."))
     }
 }

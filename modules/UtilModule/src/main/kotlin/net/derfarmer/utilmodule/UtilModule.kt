@@ -16,6 +16,7 @@ object UtilModule : Module() {
         register(PingCommand)
         register(SpecCommand)
         register(UnBanCommand)
+        register(MessageCommand)
 
         register(JoinListener)
         register(TeleportListener)
