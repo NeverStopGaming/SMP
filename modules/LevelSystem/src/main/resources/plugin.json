@@ -1,6 +1,6 @@
 {
-  "name": "ModuleManager",
-  "main": "net.derfarmer.modulemanager.ModuleManager",
+  "name": "LevelModule",
+  "main": "net.derfarmer.levelsystem.LevelModule",
   "authors": [
     "DerFarmer"
   ]

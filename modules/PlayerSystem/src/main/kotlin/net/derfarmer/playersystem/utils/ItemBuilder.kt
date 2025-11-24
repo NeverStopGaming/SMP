@@ -1,5 +1,6 @@
 package net.derfarmer.playersystem.utils
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
@@ -62,8 +63,15 @@ class ItemBuilder(material: Material?) {
         return this
     }
 
+    @Deprecated("use Components displayName(displayName : Component)")
     fun setDisplayName(displayName: String?): ItemBuilder {
         meta.setDisplayName(displayName)
+        setItemMeta(meta)
+        return this
+    }
+
+    fun displayName(displayName: Component): ItemBuilder {
+        meta.displayName(displayName)
         setItemMeta(meta)
         return this
     }
