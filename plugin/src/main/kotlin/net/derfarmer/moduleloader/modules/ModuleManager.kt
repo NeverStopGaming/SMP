@@ -104,7 +104,6 @@ object ModuleManager {
         val plugin = Bukkit.getPluginManager().plugins.first { it.name == "ModuleLoader" } as JavaPlugin
 
         modules.forEach {
-            println(it.name)
              plugin.launch{
                 it.onReload()
                 disableModule(it)
