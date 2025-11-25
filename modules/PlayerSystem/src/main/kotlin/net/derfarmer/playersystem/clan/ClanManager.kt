@@ -20,11 +20,11 @@ object ClanManager {
 
     fun createClan(player: Player, name: String, tag: String, color: String): ClanResponse {
 
-        if (clanNameBlackList.contains(name) || name.length > 10 || name.length < 3) return NAME_INVAILD
+        if (clanNameBlackList.contains(name) || name.length > 32 || name.length < 3) return NAME_INVAILD
 
         if ((Redis.db.get("clan_$name") ?: "").isNotBlank()) return NAME_INVAILD
 
-        if ((Redis.db.hget("clantags", tag) ?: "").isNotBlank() || tag.length > 10 || tag.length < 3) return TAG_INVAILD
+        if ((Redis.db.hget("clantags", tag) ?: "").isNotBlank() || tag.length < 3 || tag.length > 6) return TAG_INVAILD
 
         if (PlayerManager.getClanName(player).isNotBlank()) return ALREADY_IN_CLAN
 
@@ -76,6 +76,7 @@ object ClanManager {
 
     fun accept(accepter: Player, clan: Clan): ClanResponse {
 
+        if (PlayerManager.getClanName(accepter).isNotBlank()) return ALREADY_IN_CLAN
         if (!clan.invited.contains(accepter.uniqueId)) return NOT_INVITED
 
         clan.invited.remove(accepter.uniqueId)
@@ -126,6 +127,8 @@ object ClanManager {
 
         val member = getClanMember(clan, player.uniqueId)
 
+        if (member?.rank == ClanRank.OWNER) return CANNOT_LEAVE
+
         clan.members.remove(member)
 
         save(clan)
@@ -140,6 +143,8 @@ object ClanManager {
         getClanMember(clan, kicker.uniqueId)?.rank?.canKick?.let { if (!it) return NO_PERMISSION }
 
         val member = getClanMember(clan, kickee.uniqueId) ?: return NOT_IN_THE_CLAN
+
+        if(member.rank == ClanRank.OWNER) return NO_PERMISSION
 
         clan.members.remove(member)
 
@@ -184,6 +189,7 @@ object ClanManager {
         NAME_INVAILD,
         TAG_INVAILD,
         ALREADY_IN_CLAN,
-        NOT_IN_THE_CLAN
+        NOT_IN_THE_CLAN,
+        CANNOT_LEAVE,
     }
 }

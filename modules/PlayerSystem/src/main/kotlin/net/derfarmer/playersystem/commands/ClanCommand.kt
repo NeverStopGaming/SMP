@@ -5,6 +5,7 @@ import net.derfarmer.moduleloader.Redis
 import net.derfarmer.moduleloader.commands.Command
 import net.derfarmer.moduleloader.commands.annotations.CommandArgument
 import net.derfarmer.moduleloader.commands.annotations.CommandSubPath
+import net.derfarmer.moduleloader.commands.provider.CommandSuggestionProvider
 import net.derfarmer.moduleloader.commands.provider.PlayerCommandSuggestionProvider
 import net.derfarmer.moduleloader.sendMSG
 import net.derfarmer.playersystem.PlayerManager
@@ -22,7 +23,8 @@ object ClanCommand : Command("clan") {
     }
 
     @CommandSubPath("create <name> <tag>")
-    fun create(player: Player, @CommandArgument("name") name: String, @CommandArgument("tag") tag: String) {
+    fun create(player: Player, @CommandArgument("name", ClanNameSuggestion::class) name: String, @CommandArgument("tag",
+        ClanTagSuggestion::class) tag: String) {
         val callback = { color: String ->
             val res = ClanManager.createClan(player, name, tag, color)
 
@@ -65,7 +67,13 @@ object ClanCommand : Command("clan") {
 
     @CommandSubPath("info")
     fun handleInfo(player: Player) {
-        info(player, PlayerManager.getClan(player))
+
+        val clan = PlayerManager.getClan(player) ?: run {
+            player.sendMSG("clan.notInAClan")
+            return
+        }
+
+        info(player, clan)
     }
 
     @CommandSubPath("info <clanTag>")
@@ -107,7 +115,7 @@ object ClanCommand : Command("clan") {
     }
 
     @CommandSubPath("invite <inviteeName>")
-    fun invite(player: Player, @CommandArgument("inviteeName") inviteeName: String) {
+    fun invite(player: Player, @CommandArgument("inviteeName", PlayerCommandSuggestionProvider::class) inviteeName: String) {
         val clan = PlayerManager.getClan(player) ?: run {
             player.sendMSG("clan.notInAClan")
             return
@@ -122,7 +130,7 @@ object ClanCommand : Command("clan") {
 
         when (res) {
             ClanManager.ClanResponse.NO_PERMISSION -> player.sendMSG("clan.notPermission")
-            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.invited", invitee.name)
+            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.you.invited", invitee.name)
             ClanManager.ClanResponse.IS_ALREADY_INVITED -> player.sendMSG("clan.isAlreadyInvited")
             ClanManager.ClanResponse.ALREADY_IN_CLAN -> player.sendMSG("clan.alreadyInClan")
             else -> player.sendMSG("error.internal")
@@ -133,6 +141,7 @@ object ClanCommand : Command("clan") {
     fun accept(player: Player, @CommandArgument("clanName") clanName: String) {
         when (ClanManager.accept(player, ClanManager.getClan(clanName) ?: return)) {
             ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.accepted")
+            ClanManager.ClanResponse.ALREADY_IN_CLAN -> player.sendMSG("clan.alreadyInClan")
             ClanManager.ClanResponse.NOT_INVITED -> player.sendMSG("clan.notInvited")
             else -> player.sendMSG("error.internal")
         }
@@ -145,12 +154,11 @@ object ClanCommand : Command("clan") {
             return
         }
 
-        if (ClanManager.leave(player, clan) != ClanManager.ClanResponse.SUCCESSFUL) {
-            player.sendMSG("error.internal")
-            return
+        when (ClanManager.leave(player,clan)) {
+            ClanManager.ClanResponse.CANNOT_LEAVE -> player.sendMSG("clan.cannot_leave")
+            ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.leaved")
+            else -> player.sendMSG("error.internal")
         }
-
-        player.sendMSG("clan.leaved")
     }
 
     @CommandSubPath("kick <kickeeName>")
@@ -187,7 +195,6 @@ object ClanCommand : Command("clan") {
             player.sendMSG("error.internal")
             return
         }
-
 
         val callback = { color: String ->
             run {
@@ -284,6 +291,26 @@ object ClanCommand : Command("clan") {
             ClanManager.ClanResponse.NO_PERMISSION -> player.sendMSG("clan.notPermission")
             ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.demoted", target.name)
             else -> player.sendMSG("error.internal")
+        }
+    }
+
+    class ClanNameSuggestion : CommandSuggestionProvider {
+        override fun getSuggestions(
+            sender: Player,
+            fullCommand: String,
+            lastArgument: String
+        ): List<String> {
+            return listOf("<name>")
+        }
+    }
+
+    class ClanTagSuggestion : CommandSuggestionProvider {
+        override fun getSuggestions(
+            sender: Player,
+            fullCommand: String,
+            lastArgument: String
+        ): List<String> {
+            return listOf("<tag>")
         }
     }
 }

@@ -81,12 +81,24 @@ class ItemBuilder(material: Material?) {
         return this
     }
 
+    @Deprecated("use lore(vararg lores : Component) now")
     fun setLore(vararg lore: String?): ItemBuilder {
         meta.lore = Arrays.asList(*lore)
         setItemMeta(meta)
         return this
     }
 
+    fun lore(vararg lores: Component): ItemBuilder {
+        return lore(lores.toList())
+    }
+
+    fun lore(lores: List<Component>): ItemBuilder {
+        meta.lore(lores)
+        setItemMeta(meta)
+        return this
+    }
+
+    @Deprecated("use lore(vararg lores : Component) now")
     fun setLore(lore: List<String?>?): ItemBuilder {
         meta.lore = lore
         setItemMeta(meta)
