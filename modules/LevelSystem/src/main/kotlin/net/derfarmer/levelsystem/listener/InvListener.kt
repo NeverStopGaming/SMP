@@ -1,6 +1,6 @@
 package net.derfarmer.levelsystem.listener
 
-import net.derfarmer.levelsystem.gui.PlayerExpGui
+import net.derfarmer.levelsystem.player.PlayerExpGui
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent

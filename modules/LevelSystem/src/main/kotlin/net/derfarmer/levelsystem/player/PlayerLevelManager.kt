@@ -2,22 +2,37 @@ package net.derfarmer.levelsystem.player
 
 import net.derfarmer.playersystem.PlayerManager
 import org.bukkit.OfflinePlayer
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 object PlayerLevelManager {
 
-    var OfflinePlayer.playerExp: Int
-        set(exp) {
-            PlayerManager.setPlayerValue(this, "exp", exp.toString())
+    const val SCALER = 40.0
+    const val POWER = 2.5
+    fun calcXPRequiredForLevel(level: Int) = (SCALER * level.toDouble().pow(POWER)).roundToInt()
+
+    fun OfflinePlayer.addPlayerXP(xp: Int) {
+        playerXP += xp
+
+        while (playerXP >= calcXPRequiredForLevel(playerLevel + 1)) {
+            playerXP -= calcXPRequiredForLevel(playerLevel + 1)
+            playerLevel += 1
+        }
+    }
+
+    var OfflinePlayer.playerXP: Int
+        set(xp) {
+            PlayerManager.setPlayerValue(this, "xp", xp.toString())
         }
         get() {
-            return (PlayerManager.getPlayerValue(this, "exp") ?: "0").toInt()
+            return (PlayerManager.getPlayerValue(this, "xp") ?: "0").toInt()
         }
 
     var OfflinePlayer.playerLevel: Int
-        set(exp) {
-            PlayerManager.setPlayerValue(this, "expLevel", exp.toString())
+        set(xpLevel) {
+            PlayerManager.setPlayerValue(this, "xpLevel", xpLevel.toString())
         }
         get() {
-            return (PlayerManager.getPlayerValue(this, "expLevel") ?: "0").toInt()
+            return (PlayerManager.getPlayerValue(this, "xpLevel") ?: "0").toInt()
         }
 }

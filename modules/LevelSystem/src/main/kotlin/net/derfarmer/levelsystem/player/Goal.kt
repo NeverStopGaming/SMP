@@ -1,4 +1,4 @@
-package net.derfarmer.levelsystem.common
+package net.derfarmer.levelsystem.player
 
 import org.bukkit.entity.Entity
 
