@@ -1,4 +1,4 @@
-package net.derfarmer.levelsystem.player
+package net.derfarmer.questsystem.listener
 
 import org.bukkit.entity.Entity
 

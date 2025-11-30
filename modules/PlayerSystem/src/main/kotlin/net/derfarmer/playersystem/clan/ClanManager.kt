@@ -144,7 +144,7 @@ object ClanManager {
 
         val member = getClanMember(clan, kickee.uniqueId) ?: return NOT_IN_THE_CLAN
 
-        if(member.rank == ClanRank.OWNER) return NO_PERMISSION
+        if (member.rank == ClanRank.OWNER) return NO_PERMISSION
 
         clan.members.remove(member)
 

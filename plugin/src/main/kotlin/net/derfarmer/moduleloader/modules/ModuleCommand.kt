@@ -1,7 +1,6 @@
 package net.derfarmer.moduleloader.modules
 
 import net.derfarmer.moduleloader.commands.Command
-import net.derfarmer.moduleloader.commands.CommandManager
 import net.derfarmer.moduleloader.commands.annotations.CommandArgument
 import net.derfarmer.moduleloader.commands.annotations.CommandSubPath
 import net.derfarmer.moduleloader.commands.provider.CommandSuggestionProvider

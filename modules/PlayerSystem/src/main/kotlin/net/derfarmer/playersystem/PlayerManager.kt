@@ -99,7 +99,7 @@ object PlayerManager {
         @EventHandler
         fun onClanNewRank(event: ClanNewRankEvent) {
             val msg = Message["clan.newRank", event.clanMember.name()
-                ?: "ERROR"].append (Message.get(event.clanMember.rank.msgKey, withPrefix = false))
+                ?: "ERROR"].append(Message.get(event.clanMember.rank.msgKey, withPrefix = false))
             sendToAllClanMember(event.clan, msg)
         }
 

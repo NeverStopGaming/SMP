@@ -3,8 +3,6 @@ package net.derfarmer.moduleloader.modules
 import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
@@ -58,7 +56,7 @@ object ModuleManager {
 
     //</editor-fold>
 
-    fun loadModule(moduleConfig: JsonObject, file: File, classloader : ClassLoader) {
+    fun loadModule(moduleConfig: JsonObject, file: File, classloader: ClassLoader) {
 
         val moduleClass = classloader.loadClass(moduleConfig["main"].asString).asSubclass(Module::class.java).kotlin
 
@@ -104,7 +102,7 @@ object ModuleManager {
         val plugin = Bukkit.getPluginManager().plugins.first { it.name == "ModuleLoader" } as JavaPlugin
 
         modules.forEach {
-             plugin.launch{
+            plugin.launch {
                 it.onReload()
                 disableModule(it)
             }

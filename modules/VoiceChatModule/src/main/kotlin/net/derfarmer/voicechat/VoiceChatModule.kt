@@ -6,12 +6,12 @@ import net.derfarmer.voicechat.command.DisableVoiceCommand
 import net.derfarmer.voicechat.listener.VoiceChatListener
 
 
-object VoiceChatModule : Module(){
+object VoiceChatModule : Module() {
 
     val service: BukkitVoicechatService? = plugin.server.servicesManager.load(BukkitVoicechatService::class.java)
 
     override fun onEnable() {
-        service?.registerPlugin (VoiceChatListener)
+        service?.registerPlugin(VoiceChatListener)
         logger.info("Registered VoiceChat Service")
 
         register(DisableVoiceCommand)

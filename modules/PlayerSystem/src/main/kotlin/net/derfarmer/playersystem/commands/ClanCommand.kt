@@ -23,8 +23,12 @@ object ClanCommand : Command("clan") {
     }
 
     @CommandSubPath("create <name> <tag>")
-    fun create(player: Player, @CommandArgument("name", ClanNameSuggestion::class) name: String, @CommandArgument("tag",
-        ClanTagSuggestion::class) tag: String) {
+    fun create(
+        player: Player, @CommandArgument("name", ClanNameSuggestion::class) name: String, @CommandArgument(
+            "tag",
+            ClanTagSuggestion::class
+        ) tag: String
+    ) {
         val callback = { color: String ->
             val res = ClanManager.createClan(player, name, tag, color)
 
@@ -115,7 +119,10 @@ object ClanCommand : Command("clan") {
     }
 
     @CommandSubPath("invite <inviteeName>")
-    fun invite(player: Player, @CommandArgument("inviteeName", PlayerCommandSuggestionProvider::class) inviteeName: String) {
+    fun invite(
+        player: Player,
+        @CommandArgument("inviteeName", PlayerCommandSuggestionProvider::class) inviteeName: String
+    ) {
         val clan = PlayerManager.getClan(player) ?: run {
             player.sendMSG("clan.notInAClan")
             return
@@ -154,7 +161,7 @@ object ClanCommand : Command("clan") {
             return
         }
 
-        when (ClanManager.leave(player,clan)) {
+        when (ClanManager.leave(player, clan)) {
             ClanManager.ClanResponse.CANNOT_LEAVE -> player.sendMSG("clan.cannot_leave")
             ClanManager.ClanResponse.SUCCESSFUL -> player.sendMSG("clan.leaved")
             else -> player.sendMSG("error.internal")
