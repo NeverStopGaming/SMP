@@ -25,7 +25,7 @@ object FabricManager {
         // TODO: perform input Validation
         when (msgType) {
             '0' -> registerPlayer(player)
-            'c' -> sendCategories(player, QuestManager.getCategories())
+            'c' -> sendCategories(player, QuestManager.getCategories(player))
             'l' -> sendTree(player, QuestManager.getTree(player, data.toInt()))
             'q' -> sendQuest(player, QuestManager.getQuest(player, data.toInt()))
         }

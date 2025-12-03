@@ -1,7 +1,10 @@
 package net.derfarmer.questsystem.quest
 
-open class QuestNode(
-    open val questID: Int, open val itemID: String, open val title: String, open val x: Int, open val y: Int,
-    open val completed: Boolean, val connectionsTo: List<Pair<Int, Int>>
+data class QuestNode(
+    val questID: Int, val itemID: String, val title: String, val x: Int, val y: Int,
+    val completed: Boolean, val connectionsTo: List<Int>
 )
 
+data class DBQuestNode(val questID: Int, val itemID : String, val title: String,
+                        val x : Int, val y : Int, val connectionsTo: List<Int>,
+                        val isServerQuest : Boolean)

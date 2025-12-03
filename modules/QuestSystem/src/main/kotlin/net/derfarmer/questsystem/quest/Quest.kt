@@ -13,6 +13,7 @@ data class QuestCondition(
     val tooltip: String
 )
 
+
 enum class QuestConditionType {
     SUBMIT_ITEM,
     HAVE_ITEM,
@@ -27,3 +28,15 @@ enum class QuestRewardType {
     INTERACTION_UNLOCK,
     EFFECT_UNLOCK
 }
+
+data class DBQuestCondition(
+    val type: QuestConditionType,
+    val id: String,
+    val amount: Int,
+    val tooltip: String
+)
+
+data class DBQuest(
+    val id: Int, val title: String, val description: String, val description2: String,
+    val rewards: List<QuestReward>, val conditions: List<DBQuestCondition>
+)
