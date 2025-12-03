@@ -9,6 +9,9 @@ subprojects {
         compileOnly(project(":plugin"))
         if (project.name != "PlayerSystem") {
             compileOnly(project(":modules:PlayerSystem"))
+            if (project.name != "QuestSystem") {
+                compileOnly(project(":modules:QuestSystem"))
+            }
         }
     }
 }

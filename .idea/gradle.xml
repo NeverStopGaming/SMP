@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/modules/QuestSystem" />
             <option value="$PROJECT_DIR$/modules/UtilModule" />
             <option value="$PROJECT_DIR$/modules/VoiceChatModule" />
+            <option value="$PROJECT_DIR$/modules/WebModule" />
             <option value="$PROJECT_DIR$/plugin" />
           </set>
         </option>
