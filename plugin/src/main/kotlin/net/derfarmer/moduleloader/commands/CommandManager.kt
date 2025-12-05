@@ -20,7 +20,9 @@ object CommandManager {
             return
         }
 
-        if (!player.hasPermission(commandData.permission)) return
+        if (!player.hasPermission(commandData.permission) && commandData.permission.isNotEmpty()) {
+            return
+        }
 
         val list = arrayListOf<Any>()
 
