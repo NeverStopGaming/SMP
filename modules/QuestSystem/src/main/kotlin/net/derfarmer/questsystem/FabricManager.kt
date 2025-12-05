@@ -28,6 +28,7 @@ object FabricManager {
             'c' -> sendCategories(player, QuestManager.getCategories(player))
             'l' -> sendTree(player, QuestManager.getTree(player, data.toInt()))
             'q' -> sendQuest(player, QuestManager.getQuest(player, data.toInt()))
+            's' -> QuestManager.submit(player, data.toInt())
         }
     }
 
