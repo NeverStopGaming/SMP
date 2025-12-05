@@ -1,0 +1,7 @@
+{
+  "name": "QuestSystem",
+  "main": "net.derfarmer.questsystem.QuestModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "WebModule",
+  "main": "net.derfarmer.webmodule.WebModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}

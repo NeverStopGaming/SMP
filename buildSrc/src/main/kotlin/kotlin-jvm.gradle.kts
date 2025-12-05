@@ -17,8 +17,8 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-folia-api:2.20.0")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-folia-core:2.20.0")
     implementation(kotlin("reflect"))

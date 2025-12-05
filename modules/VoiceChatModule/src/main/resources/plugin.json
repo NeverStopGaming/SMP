@@ -1,0 +1,7 @@
+{
+  "name": "VoiceChat",
+  "main": "net.derfarmer.voicechat.VoiceChatModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}

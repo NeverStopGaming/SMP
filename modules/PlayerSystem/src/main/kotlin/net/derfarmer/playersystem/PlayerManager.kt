@@ -38,7 +38,7 @@ object PlayerManager {
             return
         }
 
-        val parsed = mm.deserialize("<${clan.color}>${player.name} <dark_gray>[<${clan.color}>${clan.name}<dark_gray>]")
+        val parsed = mm.deserialize("<${clan.color}>${player.name} <dark_gray>[<${clan.color}>${clan.tag}<dark_gray>]")
 
         player.playerListName(parsed)
     }
@@ -82,7 +82,7 @@ object PlayerManager {
 
         @EventHandler
         fun onClanInvite(event: ClanInviteEvent) {
-            event.player.sendMSG("clan.invited", event.clan.name)
+            event.player.sendMSG("clan.invited", event.clan.name, event.clan.name)
         }
 
         @EventHandler
@@ -99,7 +99,7 @@ object PlayerManager {
         @EventHandler
         fun onClanNewRank(event: ClanNewRankEvent) {
             val msg = Message["clan.newRank", event.clanMember.name()
-                ?: "ERROR", Message[event.clanMember.rank.msgKey].toString()]
+                ?: "ERROR"].append(Message.get(event.clanMember.rank.msgKey, withPrefix = false))
             sendToAllClanMember(event.clan, msg)
         }
 

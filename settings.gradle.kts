@@ -22,12 +22,10 @@ plugins {
 include(":plugin")
 
 rootProject.name = "SMP"
-include("modules:ModuleManager")
 include("modules:PlayerSystem")
 include("modules:UtilModule")
 include("modules:DiscordModule")
-include("modules:LevelSystem")
 include("modules:ElevatorSystem")
-include("modules:ElevatorSystem")
-include("modules:ElevatorSystem")
-include("modules:ElevatorSystem")
+include("modules:QuestSystem")
+include("modules:VoiceChatModule")
+include("modules:WebModule")

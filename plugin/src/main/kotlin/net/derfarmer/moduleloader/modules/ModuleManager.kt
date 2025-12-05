@@ -1,9 +1,10 @@
 package net.derfarmer.moduleloader.modules
 
+import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.bukkit.Bukkit
-import org.slf4j.Logger
+import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader
@@ -12,8 +13,6 @@ import kotlin.reflect.full.createInstance
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ModuleManager {
-
-    val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     val modules = mutableListOf<Module>()
     val modulesDir = File(Bukkit.getPluginsFolder().parent, "modules")
@@ -28,12 +27,16 @@ object ModuleManager {
 
         if (!modulesDir.exists()) modulesDir.mkdir()
 
-        modulesDir.listFiles()?.forEach { file ->
-            loadModuleFromFile(file)
+        val moduleJarFiles = modulesDir.listFiles() ?: arrayOf()
+        val moduleUrls = moduleJarFiles.map { it.toURI().toURL() }.toTypedArray()
+        val sharedLoader = URLClassLoader(moduleUrls, this.javaClass.classLoader)
+
+        moduleJarFiles.forEach {
+            loadModuleFromFile(it, sharedLoader)
         }
     }
 
-    fun loadModuleFromFile(file: File) {
+    fun loadModuleFromFile(file: File, classloader: ClassLoader) {
 
         val jarFile = JarFile(file)
 
@@ -45,7 +48,7 @@ object ModuleManager {
                 .toString(Charsets.UTF_8)
         ).asJsonObject
 
-        loadModule(configJson, file)
+        loadModule(configJson, file, classloader)
 
         jarFile.close()
 
@@ -53,9 +56,7 @@ object ModuleManager {
 
     //</editor-fold>
 
-    fun loadModule(moduleConfig: JsonObject, file: File) {
-
-        val classloader = URLClassLoader(arrayOf(file.toURI().toURL()), this.javaClass.classLoader)
+    fun loadModule(moduleConfig: JsonObject, file: File, classloader: ClassLoader) {
 
         val moduleClass = classloader.loadClass(moduleConfig["main"].asString).asSubclass(Module::class.java).kotlin
 
@@ -85,32 +86,27 @@ object ModuleManager {
         module.onEnable()
     }
 
-    fun reloadModule(plugin: Module) {
+    fun disableModule(module: Module) {
 
-        plugin.unregisterAll()
-        plugin.onReload()
+        module.logger.info("Disabling Module ${module.name}")
 
-        val file = moduleFiles[plugin]!!
+        module.unregisterAll()
+        module.onDisable()
+        modules.remove(module)
+    }
 
-        if (!file.exists()) {
-            logger.error("File of \"${plugin.name}\" Plugin does not exist.")
-            return
+    fun disableAllModules() = modules.forEach { disableModule(it) }
+
+    fun reloadModules() {
+
+        val plugin = Bukkit.getPluginManager().plugins.first { it.name == "ModuleLoader" } as JavaPlugin
+
+        modules.forEach {
+            plugin.launch {
+                it.onReload()
+                disableModule(it)
+            }
         }
-
-        modules.remove(plugin)
-
-        loadModuleFromFile(file)
-
+        loadModulesFromFiles()
     }
-
-    fun disableModule(plugin: Module) {
-        plugin.unregisterAll()
-        plugin.onDisable()
-        modules.remove(plugin)
-    }
-
-    fun disableAllModules() = modules.toMutableList().forEach { disableModule(it) }
-
-    fun reloadAllModules() = modules.toMutableList().forEach { reloadModule(it) }
-
 }
