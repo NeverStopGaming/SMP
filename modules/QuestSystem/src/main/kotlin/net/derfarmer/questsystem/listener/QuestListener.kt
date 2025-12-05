@@ -12,26 +12,26 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 
-object QuestListener : Listener{
+object QuestListener : Listener {
 
     @EventHandler
     fun onItem(event: EntityPickupItemEvent) {
-        if(event.entity !is Player) return
+        if (event.entity !is Player) return
         QuestManager.haveItem(event.entity as Player, event.item.itemStack)
     }
 
     @EventHandler
-    fun onItem(event : InventoryMoveItemEvent) {
+    fun onItem(event: InventoryMoveItemEvent) {
         if (event.destination !is PlayerInventory) return
         val inv = event.destination as PlayerInventory
 
-        if(inv.holder !is Player) return
+        if (inv.holder !is Player) return
 
         QuestManager.haveItem(inv.holder as Player, event.item)
     }
 
     @EventHandler
-    fun onCraft(event : CraftItemEvent) {
+    fun onCraft(event: CraftItemEvent) {
         if (event.whoClicked !is Player) return
         val player = event.whoClicked as Player
         val result: ItemStack = event.inventory.result ?: return
@@ -46,8 +46,8 @@ object QuestListener : Listener{
     }
 
     @EventHandler
-    fun onKillMob(event : EntityDeathEvent) {
-        if(event.damageSource !is Player) return
+    fun onKillMob(event: EntityDeathEvent) {
+        if (event.damageSource !is Player) return
         QuestManager.killMob(event.damageSource as Player, event.entity)
     }
 }

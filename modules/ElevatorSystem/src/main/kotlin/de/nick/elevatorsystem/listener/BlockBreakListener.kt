@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 
-object BlockBreakListener : Listener{
+object BlockBreakListener : Listener {
 
     @EventHandler
     fun onBreak(event: BlockBreakEvent) {

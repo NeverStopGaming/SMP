@@ -14,44 +14,59 @@ object QuestManager {
 
     const val CATEGORIES_DB_KEY = "quest_categories"
     fun getCategories(player: Player): List<QuestCategory> {
-        val categories = gson.fromJson<Array<DBQuestCategory>>(db[CATEGORIES_DB_KEY], arrayOf<DBQuestCategory>()::class.java)
+        val categories =
+            gson.fromJson<Array<DBQuestCategory>>(db[CATEGORIES_DB_KEY], arrayOf<DBQuestCategory>()::class.java)
         val map = getPlayerCategories(player)
         return categories.map { QuestCategory(it.id, it.title, map.getOrDefault(it.id, 0)) }
     }
 
     const val QUEST_TREE_DB_KEY = "quest_tree_"
     fun getTree(player: Player, questTreeId: Int): List<QuestNode> {
-        val tree = gson.fromJson<Array<DBQuestNode>>(db[QUEST_TREE_DB_KEY + questTreeId], arrayOf<DBQuestNode>()::class.java)
+        val tree =
+            gson.fromJson<Array<DBQuestNode>>(db[QUEST_TREE_DB_KEY + questTreeId], arrayOf<DBQuestNode>()::class.java)
 
         val map = getPlayerTree(player, questTreeId)
-        return tree.map { QuestNode(it.questID, it.itemID, it.title, it.x, it.y,
-            map.getOrDefault(it.questID, false),it.connectionsTo) }
+        return tree.map {
+            QuestNode(
+                it.questID, it.itemID, it.title, it.x, it.y,
+                map.getOrDefault(it.questID, false), it.connectionsTo
+            )
+        }
     }
 
     const val QUEST_DB_KEY = "quest_"
     fun getQuest(player: Player, questId: Int): Quest {
         val quest = gson.fromJson(db[QUEST_DB_KEY + questId], DBQuest::class.java)
 
-        return Quest(quest.id, quest.title, quest.description, quest.description2, quest.rewards,
-            quest.conditions.map { QuestCondition(it.type, it.id, it.amount, getConditionAmount(player, quest, it.id), it.tooltip) })
+        return Quest(
+            quest.id, quest.title, quest.description, quest.description2, quest.rewards,
+            quest.conditions.map {
+                QuestCondition(
+                    it.type,
+                    it.id,
+                    it.amount,
+                    getConditionAmount(player, quest, it.id),
+                    it.tooltip
+                )
+            })
     }
 
-    fun getConditionAmount(player: Player, quest: DBQuest, condition: String) : Int{
+    fun getConditionAmount(player: Player, quest: DBQuest, condition: String): Int {
 
         return 0
     }
 
-    fun getPlayerTree(player: Player, questTreeId: Int) : Map<Int, Boolean>{
+    fun getPlayerTree(player: Player, questTreeId: Int): Map<Int, Boolean> {
         val map = mutableMapOf<Int, Boolean>()
         return map
     }
 
-    fun getPlayerCategories(player: Player) : Map<Int, Int>{
+    fun getPlayerCategories(player: Player): Map<Int, Int> {
         val map = mutableMapOf<Int, Int>()
         return map
     }
 
-    fun haveItem(player: Player, item : ItemStack) {
+    fun haveItem(player: Player, item: ItemStack) {
         //1. check if there is a open quest with have Item
         //2. check if the picked up item is in the list
         //3. check the current amount in the inventory

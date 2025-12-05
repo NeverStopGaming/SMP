@@ -7,20 +7,13 @@ import net.derfarmer.moduleloader.gson
 import net.derfarmer.moduleloader.modules.Module
 import net.derfarmer.questsystem.FabricManager
 import net.derfarmer.questsystem.QuestManager
-import net.derfarmer.questsystem.quest.DBQuest
-import net.derfarmer.questsystem.quest.DBQuestCategory
-import net.derfarmer.questsystem.quest.DBQuestCondition
-import net.derfarmer.questsystem.quest.DBQuestNode
-import net.derfarmer.questsystem.quest.Quest
-import net.derfarmer.questsystem.quest.QuestCategory
-import net.derfarmer.questsystem.quest.QuestCondition
-import net.derfarmer.questsystem.quest.QuestNode
+import net.derfarmer.questsystem.quest.*
 import org.bukkit.Bukkit
 
 
 object WebModule : Module() {
 
-    val app: Javalin = Javalin.create {cfg ->
+    val app: Javalin = Javalin.create { cfg ->
         cfg.staticFiles.add { staticFileConfig ->
             staticFileConfig.hostedPath = "/"
             staticFileConfig.directory = "/public"
@@ -61,14 +54,18 @@ object WebModule : Module() {
 
             val nodes = gson.fromJson<Array<ReqQuestNode>>(ctx.body(), arrayOf<ReqQuestNode>()::class.java)
 
-            val data = nodes.map { reqNodeToDBNode(it) }.map { QuestNode(it.questID, it.itemID, it.title,
-                it.x, it.y,true, it.connectionsTo) }
+            val data = nodes.map { reqNodeToDBNode(it) }.map {
+                QuestNode(
+                    it.questID, it.itemID, it.title,
+                    it.x, it.y, true, it.connectionsTo
+                )
+            }
 
 
             for (player in Bukkit.getOnlinePlayers()) {
                 if (!FabricManager.isFabricPlayer(player)) continue
                 // check completed status
-                FabricManager.sendTree(player,data)
+                FabricManager.sendTree(player, data)
             }
 
             ctx.status(200)
@@ -93,14 +90,20 @@ object WebModule : Module() {
         app.put("/quest/{id}") { ctx ->
 
             val quest = gson.fromJson(ctx.body(), DBQuest::class.java)
-            val data = Quest(quest.id, quest.title, quest.description, quest.description2, quest.rewards, quest.conditions.map {
-                QuestCondition(it.type, it.id, it.amount, 0, it.tooltip)
-            })
+            val data = Quest(
+                quest.id,
+                quest.title,
+                quest.description,
+                quest.description2,
+                quest.rewards,
+                quest.conditions.map {
+                    QuestCondition(it.type, it.id, it.amount, 0, it.tooltip)
+                })
 
             for (player in Bukkit.getOnlinePlayers()) {
                 if (!FabricManager.isFabricPlayer(player)) continue
                 // check completed status
-                FabricManager.sendQuest(player,data)
+                FabricManager.sendQuest(player, data)
             }
 
             ctx.status(200)
@@ -116,7 +119,7 @@ object WebModule : Module() {
 
         app.get("/quest/{id}") { ctx ->
             val json = Redis.db[QuestManager.QUEST_DB_KEY + ctx.pathParam("id")]
-            ctx.json( gson.fromJson(json, DBQuest::class.java))
+            ctx.json(gson.fromJson(json, DBQuest::class.java))
         }
     }
 
@@ -128,7 +131,7 @@ object WebModule : Module() {
         app.stop()
     }
 
-    fun reqNodeToDBNode(node : ReqQuestNode) : DBQuestNode {
+    fun reqNodeToDBNode(node: ReqQuestNode): DBQuestNode {
 
         val connections = node.connectionsTo.split(" ").filter { it.isNotBlank() }.map { it.toInt() }
         val array = mutableListOf<Int>()
@@ -136,16 +139,22 @@ object WebModule : Module() {
 
         val id = if (node.questID.isNotBlank()) node.questID.toInt() else -1
 
-        return DBQuestNode(id, node.itemID, node.title, node.x, node.y,
-            array,node.isServerQuest.toBoolean())
+        return DBQuestNode(
+            id, node.itemID, node.title, node.x, node.y,
+            array, node.isServerQuest.toBoolean()
+        )
     }
 
-    fun dbNodeToReqNode(db : DBQuestNode): ReqQuestNode {
-        return ReqQuestNode(db.questID.toString(), db.itemID, db.title, db.x, db.y,
-            db.connectionsTo.joinToString(" "),db.isServerQuest.toString())
+    fun dbNodeToReqNode(db: DBQuestNode): ReqQuestNode {
+        return ReqQuestNode(
+            db.questID.toString(), db.itemID, db.title, db.x, db.y,
+            db.connectionsTo.joinToString(" "), db.isServerQuest.toString()
+        )
     }
 
-    data class ReqQuestNode(val questID: String, val itemID : String, val title: String,
-                           val x : Int, val y : Int, val connectionsTo: String,
-                           val isServerQuest : String = false.toString())
+    data class ReqQuestNode(
+        val questID: String, val itemID: String, val title: String,
+        val x: Int, val y: Int, val connectionsTo: String,
+        val isServerQuest: String = false.toString()
+    )
 }

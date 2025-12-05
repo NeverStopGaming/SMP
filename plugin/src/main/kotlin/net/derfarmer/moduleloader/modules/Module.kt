@@ -6,8 +6,6 @@ import org.bukkit.Bukkit
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.inventory.CraftingRecipe
-import org.bukkit.inventory.Recipe
-import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

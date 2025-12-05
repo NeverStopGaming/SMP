@@ -21,7 +21,7 @@ object InventoryClickListener : Listener {
         if (player !is Player) return
 
 
-        if(event.slot == 4) {
+        if (event.slot == 4) {
             event.isCancelled = true
 
             if (!holder.isOwner(player) && !player.isOp) {
@@ -29,7 +29,8 @@ object InventoryClickListener : Listener {
                 return
             }
 
-            holder.accessLevel = Elevator.AccessLevel.entries[(holder.accessLevel.ordinal + 1) % Elevator.AccessLevel.entries.size]
+            holder.accessLevel =
+                Elevator.AccessLevel.entries[(holder.accessLevel.ordinal + 1) % Elevator.AccessLevel.entries.size]
             holder.buildGUI()
 
             return

@@ -1,7 +1,7 @@
 package de.nick.elevatorsystem.listener
 
-import de.nick.elevatorsystem.utils.Elevator
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
+import de.nick.elevatorsystem.utils.Elevator
 import net.derfarmer.moduleloader.sendMSG
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
@@ -55,8 +55,13 @@ object PlayerJumpListener : Listener {
                         teleportLocation.yaw = player.yaw
                         teleportLocation.pitch = player.pitch
                         player.teleportAsync(teleportLocation.add(0.5, 0.5, 0.5))
-                        player.showTitle(Title.title(Component.text("§a▲ Up ▲"), Component.text(""), Title.Times.times(
-                            Duration.ofMillis(10), Duration.ofSeconds(1), Duration.ofMillis(10))))
+                        player.showTitle(
+                            Title.title(
+                                Component.text("§a▲ Up ▲"), Component.text(""), Title.Times.times(
+                                    Duration.ofMillis(10), Duration.ofSeconds(1), Duration.ofMillis(10)
+                                )
+                            )
+                        )
                         player.playSound(player.location, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 2f)
 
 

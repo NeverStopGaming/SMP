@@ -15,41 +15,45 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-class Elevator (private val block: DaylightDetector) : InventoryHolder {
+class Elevator(private val block: DaylightDetector) : InventoryHolder {
 
     private val namespacedAccessLevel = NamespacedKey("ev1", "elevator_access_level")
     private val namespacedOwner = NamespacedKey("ev1", "elevator_owner")
 
-    var accessLevel = AccessLevel.valueOf(block.persistentDataContainer.getOrDefault(
-        namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.OWNER.toString()))
+    var accessLevel = AccessLevel.valueOf(
+        block.persistentDataContainer.getOrDefault(
+            namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.OWNER.toString()
+        )
+    )
         set(value) {
             block.persistentDataContainer.set(
-                namespacedAccessLevel, PersistentDataType.STRING, value.toString())
+                namespacedAccessLevel, PersistentDataType.STRING, value.toString()
+            )
             block.update()
             field = value
         }
 
-    private val inv = Bukkit.createInventory(this, InventoryType.DISPENSER,  Component.text("Elevator"))
+    private val inv = Bukkit.createInventory(this, InventoryType.DISPENSER, Component.text("Elevator"))
 
     init {
         buildGUI()
     }
 
     fun buildGUI() {
-        for (i in 0.. 8) {
+        for (i in 0..8) {
             inventory.setItem(i, ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName("§d").build())
         }
 
         inv.setItem(4, accessLevel.item)
     }
 
-    fun canAccess(player: Player) : Boolean{
+    fun canAccess(player: Player): Boolean {
 
         if (accessLevel == AccessLevel.PUBLIC) return true
 
         val id = block.persistentDataContainer.get(namespacedOwner, PersistentDataType.STRING)
 
-        if(id == null) {
+        if (id == null) {
             block.persistentDataContainer.set(namespacedOwner, PersistentDataType.STRING, player.uniqueId.toString())
             block.update()
             return true
@@ -57,7 +61,7 @@ class Elevator (private val block: DaylightDetector) : InventoryHolder {
 
         if (player.uniqueId.toString() == id) return true
 
-        if(accessLevel != AccessLevel.CLAN) return false
+        if (accessLevel != AccessLevel.CLAN) return false
 
         if (PlayerManager.getClanName(player) == Redis.db.hget("player_$id", "clan")) return true
 
@@ -72,9 +76,14 @@ class Elevator (private val block: DaylightDetector) : InventoryHolder {
         return inv
     }
 
-    enum class AccessLevel(val item : ItemStack) {
+    enum class AccessLevel(val item: ItemStack) {
         PUBLIC(ItemBuilder(Material.GREEN_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Alle Spieler").build()),
-        CLAN(ItemBuilder(Material.YELLOW_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Alle aus dem Clan", "§7des Besitzers").build()),
-        OWNER(ItemBuilder(Material.RED_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Nur der Besitzer").build()),
+        CLAN(
+            ItemBuilder(Material.YELLOW_WOOL).setDisplayName("§7Sicherheitsstufe")
+                .setLore("§7Alle aus dem Clan", "§7des Besitzers").build()
+        ),
+        OWNER(
+            ItemBuilder(Material.RED_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Nur der Besitzer").build()
+        ),
     }
 }

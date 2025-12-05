@@ -3,14 +3,12 @@ package net.derfarmer.moduleloader.modules
 import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import net.derfarmer.moduleloader.ModuleLoader
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader
 import java.util.jar.JarFile
-import kotlin.math.log
 import kotlin.reflect.full.createInstance
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -54,7 +52,7 @@ object ModuleManager {
 
         try {
             loadModule(configJson, file, classloader)
-        } catch (e : Exception) {
+        } catch (e: Exception) {
 
             logger.error("Load failed on ${file.name}")
             e.printStackTrace()

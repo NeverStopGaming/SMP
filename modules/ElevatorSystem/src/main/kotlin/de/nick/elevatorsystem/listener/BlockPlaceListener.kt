@@ -9,7 +9,7 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-object BlockPlaceListener : Listener{
+object BlockPlaceListener : Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {

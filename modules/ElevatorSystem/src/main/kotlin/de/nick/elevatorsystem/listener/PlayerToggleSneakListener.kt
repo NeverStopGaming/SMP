@@ -57,8 +57,13 @@ object PlayerToggleSneakListener : Listener {
                     elevatorLocation.pitch = player.pitch
 
                     player.teleportAsync(elevatorLocation.add(0.5, 0.5, 0.5))
-                    player.showTitle(Title.title(Component.text("§c▼ Down ▼"), Component.text(""), Title.Times.times(
-                        Duration.ofMillis(10), Duration.ofSeconds(1), Duration.ofMillis(10))))
+                    player.showTitle(
+                        Title.title(
+                            Component.text("§c▼ Down ▼"), Component.text(""), Title.Times.times(
+                                Duration.ofMillis(10), Duration.ofSeconds(1), Duration.ofMillis(10)
+                            )
+                        )
+                    )
                     player.playSound(player.location, Sound.ENTITY_ENDERMAN_TELEPORT, 2f, 2f)
                     return
                 }
