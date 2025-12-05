@@ -1,6 +1,8 @@
 package de.nick.elevatorsystem.utils
 
-import jdk.javadoc.internal.tool.AccessLevel
+import net.derfarmer.moduleloader.Redis
+import net.derfarmer.playersystem.PlayerManager
+import net.derfarmer.playersystem.utils.ItemBuilder
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -19,7 +21,7 @@ class Elevator (private val block: DaylightDetector) : InventoryHolder {
     private val namespacedOwner = NamespacedKey("ev1", "elevator_owner")
 
     var accessLevel = AccessLevel.valueOf(block.persistentDataContainer.getOrDefault(
-        namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.PRIVATE.toString()))
+        namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.OWNER.toString()))
         set(value) {
             block.persistentDataContainer.set(
                 namespacedAccessLevel, PersistentDataType.STRING, value.toString())
@@ -57,7 +59,8 @@ class Elevator (private val block: DaylightDetector) : InventoryHolder {
 
         if(accessLevel != AccessLevel.CLAN) return false
 
-        if (player.getClan() == PlayerManager.getClan(id)) return true
+        if (PlayerManager.getClanName(player) == Redis.db.hget("player_$id", "clan")) return true
+
 
         return false
     }
@@ -67,5 +70,11 @@ class Elevator (private val block: DaylightDetector) : InventoryHolder {
 
     override fun getInventory(): Inventory {
         return inv
+    }
+
+    enum class AccessLevel(val item : ItemStack) {
+        PUBLIC(ItemBuilder(Material.GREEN_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Alle Spieler").build()),
+        CLAN(ItemBuilder(Material.YELLOW_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Alle aus dem Clan", "§7des Besitzers").build()),
+        OWNER(ItemBuilder(Material.RED_WOOL).setDisplayName("§7Sicherheitsstufe").setLore("§7Nur der Besitzer").build()),
     }
 }

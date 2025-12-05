@@ -1,6 +1,6 @@
 {
-  "name": "ElevatorSystem",
-  "main": "de.nick.modulemanager.ElevatorSystem",
+  "name": "ElevatorModule",
+  "main": "de.nick.elevatorsystem.ElevatorModule",
   "authors": [
     "nick"
   ]

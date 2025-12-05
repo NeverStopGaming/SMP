@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 
-object InventoryListener : Listener {
+object InventoryClickListener : Listener {
 
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
