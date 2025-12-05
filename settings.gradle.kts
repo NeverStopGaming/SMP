@@ -25,6 +25,7 @@ rootProject.name = "SMP"
 include("modules:PlayerSystem")
 include("modules:UtilModule")
 include("modules:DiscordModule")
+include("modules:ElevatorSystem")
 include("modules:QuestSystem")
 include("modules:VoiceChatModule")
 include("modules:WebModule")
