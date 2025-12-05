@@ -5,6 +5,9 @@ import net.derfarmer.moduleloader.commands.CommandManager
 import org.bukkit.Bukkit
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.inventory.CraftingRecipe
+import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,8 +32,9 @@ abstract class Module {
 
     abstract fun onReload()
 
-    private val listenerHandler = arrayListOf<Listener>()
-    private val commandHandler = arrayListOf<Command>()
+    private val listenerHandler = mutableListOf<Listener>()
+    private val commandHandler = mutableListOf<Command>()
+    private val recipeHandler = mutableListOf<CraftingRecipe>()
 
     fun register(command: Command) {
         CommandManager.registerCommand(plugin, command)
@@ -42,12 +46,20 @@ abstract class Module {
         listenerHandler.add(listener)
     }
 
+    fun register(recipe: CraftingRecipe) {
+        Bukkit.getServer().addRecipe(recipe)
+        recipeHandler.add(recipe)
+    }
+
     fun unregisterAll() {
         commandHandler.forEach {
             CommandManager.unregisterCommand(plugin, it)
         }
         listenerHandler.forEach {
             HandlerList.unregisterAll(it)
+        }
+        recipeHandler.forEach {
+            Bukkit.removeRecipe(it.key)
         }
     }
 }

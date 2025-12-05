@@ -3,12 +3,14 @@ package net.derfarmer.moduleloader.modules
 import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import net.derfarmer.moduleloader.ModuleLoader
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader
 import java.util.jar.JarFile
+import kotlin.math.log
 import kotlin.reflect.full.createInstance
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -17,6 +19,8 @@ object ModuleManager {
     val modules = mutableListOf<Module>()
     val modulesDir = File(Bukkit.getPluginsFolder().parent, "modules")
     private val moduleFiles = hashMapOf<Module, File>()
+
+    val logger = LoggerFactory.getLogger(this::class.java)
 
     init {
         loadModulesFromFiles()
@@ -48,7 +52,13 @@ object ModuleManager {
                 .toString(Charsets.UTF_8)
         ).asJsonObject
 
-        loadModule(configJson, file, classloader)
+        try {
+            loadModule(configJson, file, classloader)
+        } catch (e : Exception) {
+
+            logger.error("Load failed on ${file.name}")
+            e.printStackTrace()
+        }
 
         jarFile.close()
 
@@ -106,7 +116,7 @@ object ModuleManager {
                 it.onReload()
                 disableModule(it)
             }
+            loadModulesFromFiles()
         }
-        loadModulesFromFiles()
     }
 }
