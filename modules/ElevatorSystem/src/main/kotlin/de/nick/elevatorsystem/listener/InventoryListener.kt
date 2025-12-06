@@ -1,5 +1,6 @@
 package de.nick.elevatorsystem.listener
 
+import de.nick.elevatorsystem.utils.AccessLevel
 import de.nick.elevatorsystem.utils.Elevator
 import net.derfarmer.moduleloader.sendMSG
 import org.bukkit.entity.Player
@@ -30,7 +31,7 @@ object InventoryListener : Listener {
             }
 
             holder.accessLevel =
-                Elevator.AccessLevel.entries[(holder.accessLevel.ordinal + 1) % Elevator.AccessLevel.entries.size]
+                AccessLevel.entries[(holder.accessLevel.ordinal + 1) % AccessLevel.entries.size]
             holder.buildGUI()
 
             return

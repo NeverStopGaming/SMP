@@ -1,6 +1,12 @@
 package de.nick.elevatorsystem
 
+import de.nick.elevatorsystem.command.SpawnLauncherCommand
 import de.nick.elevatorsystem.listener.*
+import de.nick.elevatorsystem.listener.player.PlayerInteractListener
+import de.nick.elevatorsystem.listener.player.PlayerJumpListener
+import de.nick.elevatorsystem.listener.player.PlayerMoveListener
+import de.nick.elevatorsystem.listener.player.PlayerToggleSneakListener
+import de.nick.elevatorsystem.utils.PlayerFlyStart
 import net.derfarmer.moduleloader.modules.Module
 import net.derfarmer.playersystem.utils.ItemBuilder
 import org.bukkit.Material
@@ -23,14 +29,36 @@ object ElevatorModule : Module() {
         elevatorRecipe.setIngredient('E', Material.DAYLIGHT_DETECTOR)
         elevatorRecipe.setIngredient('N', Material.ENDER_PEARL)
 
-        register(elevatorRecipe)
+        val elytraLauncherRecipe = ShapedRecipe(NamespacedKey("ev1", "elytralauncher_recipe"),
+            ItemBuilder(Material.DISPENSER).setDisplayName("§l§2Elytra Launcher")
+                .setLore("§3Platziere den Elytra Launcher mit dem Loch nach oben und befülle ihn mit Treibstoff\", \"§3Anschließend kannst du dich boosten lassen, indem du sneakst.")
+                .setData("ev1", "elytra_launcher", 1).build())
+
+        elytraLauncherRecipe.shape("***", "*A*", "*B*")
+        elytraLauncherRecipe.setIngredient('*', Material.FIREWORK_ROCKET)
+        elytraLauncherRecipe.setIngredient('A', Material.DISPENSER)
+        elytraLauncherRecipe.setIngredient('B', Material.FIRE_CHARGE)
+
+
+        try {
+            register(elevatorRecipe)
+            register(elytraLauncherRecipe)
+        } catch (e: Exception) {
+            println(e)
+        }
+
+
+        register(SpawnLauncherCommand)
+
         register(BlockBreakListener)
         register(BlockPlaceListener)
         register(InventoryClickListener)
         register(InventoryListener)
         register(PlayerInteractListener)
         register(PlayerJumpListener)
+        register(PlayerMoveListener)
         register(PlayerToggleSneakListener)
+        register(PlayerFlyStart)
     }
 
     override fun onDisable() {

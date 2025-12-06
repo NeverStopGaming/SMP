@@ -1,4 +1,4 @@
-package de.nick.elevatorsystem.listener
+package de.nick.elevatorsystem.listener.player
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import de.nick.elevatorsystem.utils.Elevator
