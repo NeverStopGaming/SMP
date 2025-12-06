@@ -1,13 +1,16 @@
 package de.nick.elevatorsystem.listener
 
 import de.nick.elevatorsystem.utils.Elevator
+import de.nick.elevatorsystem.utils.Launcher
 import net.derfarmer.moduleloader.sendMSG
+import net.derfarmer.playersystem.utils.ItemBuilder
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.DaylightDetector
+import org.bukkit.block.Dispenser
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -64,5 +67,48 @@ object BlockBreakListener : Listener {
             }
             block.location.world.dropItemNaturally(block.location.toCenterLocation(), elevator)
         }
+
+        /*
+
+            Launcher
+
+         */
+
+        if (block.type == Material.DISPENSER) {
+            val dispenser = block.state as Dispenser
+            val launcherLvl = dispenser.persistentDataContainer.get(
+                NamespacedKey("ev1", "elytra_launcher"),
+                PersistentDataType.INTEGER,
+            ) ?: return
+
+            val holder = Launcher(dispenser, launcherLvl)
+
+            if (!holder.canAccess(player) && !player.isOp) {
+                event.isCancelled = true
+                player.sendMessage("Dazu hast du keine Rechte")
+                return
+            }
+
+            if (launcherLvl == 100) {
+                block.type = Material.AIR
+                return
+            }
+            event.isCancelled = true
+            block.type = Material.AIR
+
+            block.location.world.dropItemNaturally(block.location.toCenterLocation(),
+
+                ItemBuilder(Material.DISPENSER).setDisplayName("§l§2Elytra Launcher")
+                    .setLore("§3Platziere den Elytra Launcher mit dem Loch nach oben und befülle ihn mit Treibstoff\", \"§3Anschließend kannst du dich boosten lassen, indem du sneakst.")
+                    .setData("ev1", "elytra_launcher", launcherLvl)
+                    .build())
+
+            for (i in 0 until dispenser.inventory.size) {
+                if (dispenser.inventory.getItem(i) != null) {
+                    block.location.world.dropItemNaturally(block.location.toCenterLocation(), dispenser.inventory.getItem(i)!!)
+                }
+            }
+        }
+
     }
 }
