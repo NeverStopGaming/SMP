@@ -1,5 +1,6 @@
 package de.nick.elevatorsystem
 
+import de.nick.elevatorsystem.command.SpawnLauncherCommand
 import de.nick.elevatorsystem.listener.*
 import de.nick.elevatorsystem.listener.player.PlayerInteractListener
 import de.nick.elevatorsystem.listener.player.PlayerJumpListener
@@ -46,6 +47,8 @@ object ElevatorModule : Module() {
             println(e)
         }
 
+
+        register(SpawnLauncherCommand)
 
         register(BlockBreakListener)
         register(BlockPlaceListener)
