@@ -119,6 +119,6 @@ object InventoryClickListener : Listener {
         }
 
         holder.upgrade(netheriteBlockCount)
-        player.sendMessage("Der Launcher wurde auf Level ${holder.level} verbessert.")
+        player.sendMSG("launcher.upgrade.lvl", holder.level.toString())
     }
 }
