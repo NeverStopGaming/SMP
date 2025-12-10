@@ -1,6 +1,6 @@
 package net.derfarmer.questsystem.listener
 
-import net.derfarmer.questsystem.QuestManager
+import net.derfarmer.questsystem.QuestDataManager
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -9,15 +9,19 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
+import kotlin.time.measureTime
+
 
 object QuestListener : Listener {
 
     @EventHandler
     fun onItem(event: EntityPickupItemEvent) {
         if (event.entity !is Player) return
-        QuestManager.haveItem(event.entity as Player, event.item.itemStack)
+
+        QuestDataManager.haveItem(event.entity as Player, event.item.itemStack)
     }
 
     @EventHandler
@@ -27,27 +31,39 @@ object QuestListener : Listener {
 
         if (inv.holder !is Player) return
 
-        QuestManager.haveItem(inv.holder as Player, event.item)
+        QuestDataManager.haveItem(inv.holder as Player, event.item)
     }
 
     @EventHandler
     fun onCraft(event: CraftItemEvent) {
         if (event.whoClicked !is Player) return
         val player = event.whoClicked as Player
-        val result: ItemStack = event.inventory.result ?: return
+        val result: ItemStack = event.recipe.result
 
-        QuestManager.craftItem(player, result)
-        QuestManager.haveItem(player, result)
+        QuestDataManager.craftItem(player, result)
+        QuestDataManager.haveItem(player, result)
     }
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        QuestManager.breakBlock(event.player, event.block)
+        QuestDataManager.breakBlock(event.player, event.block.type)
     }
 
     @EventHandler
     fun onKillMob(event: EntityDeathEvent) {
-        if (event.damageSource !is Player) return
-        QuestManager.killMob(event.damageSource as Player, event.entity)
+        if (event.entity.killer == null) return
+
+        QuestDataManager.killMob(event.entity.killer!!, event.entity)
+    }
+
+    @EventHandler
+    fun onJoin(event : PlayerJoinEvent) {
+        val timeTaken = measureTime {
+            QuestDataManager.initTrackers(event.player)
+        }
+        event.player.sendMessage("TimeTaken: $timeTaken")
+        println("TimeTaken: $timeTaken")
+
+        //TODO: Check if any server quest were completed
     }
 }

@@ -12,8 +12,10 @@ object DiscordModule : Module() {
     }
 
     override fun onDisable() {
+        DiscordManager.jda.shutdownNow()
     }
 
     override fun onReload() {
+        DiscordManager.jda.shutdownNow()
     }
 }
