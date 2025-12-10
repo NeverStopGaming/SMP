@@ -1,10 +1,8 @@
 package net.derfarmer.moduleloader.modules
 
-import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.bukkit.Bukkit
-import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader

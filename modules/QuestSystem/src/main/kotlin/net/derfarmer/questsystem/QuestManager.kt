@@ -41,7 +41,7 @@ object QuestManager {
 
         return Quest(
             quest.id, quest.title, quest.description, quest.description2, quest.rewards,
-            quest.conditions.withIndex().map { (i : Int, it : DBQuestCondition) ->
+            quest.conditions.withIndex().map { (i: Int, it: DBQuestCondition) ->
                 QuestCondition(
                     it.type,
                     it.id,
@@ -52,12 +52,12 @@ object QuestManager {
             })
     }
 
-     fun getPlayerCategories(player: Player): Map<Int, Int> {
+    fun getPlayerCategories(player: Player): Map<Int, Int> {
         val map = mutableMapOf<Int, Int>()
         return map
     }
 
-    fun completeQuest(player: Player, quest: DBQuest, name : String) {
+    fun completeQuest(player: Player, quest: DBQuest, name: String) {
         db.hset(QuestDataManager.QUEST_TREE_DATA_DB_KEY + name, quest.id.toString(), "true")
         FabricManager.sendToast(player, "Quest Abgeschlossen", quest.title)
         QuestDataManager.initTrackers(player)

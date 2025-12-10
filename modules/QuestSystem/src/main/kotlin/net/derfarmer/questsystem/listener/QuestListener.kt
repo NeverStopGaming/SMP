@@ -57,7 +57,7 @@ object QuestListener : Listener {
     }
 
     @EventHandler
-    fun onJoin(event : PlayerJoinEvent) {
+    fun onJoin(event: PlayerJoinEvent) {
         val timeTaken = measureTime {
             QuestDataManager.initTrackers(event.player)
         }

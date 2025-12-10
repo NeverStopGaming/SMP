@@ -4,7 +4,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityToggleGlideEvent
-import java.util.*
 
 object PlayerFlyStart : Listener {
     val fly: java.util.ArrayList<Player> = ArrayList()

@@ -130,7 +130,7 @@ class ItemBuilder(material: Material?) {
         return this
     }
 
-    fun setCustomModelData(string: String) : ItemBuilder {
+    fun setCustomModelData(string: String): ItemBuilder {
         val model = meta.customModelDataComponent
         model.strings = listOf(string)
         meta.setCustomModelDataComponent(model)

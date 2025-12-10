@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 object UnBanCommand : Command("unban") {
 
     @CommandSubPath("<target>")
-    fun handle(player: Player,@CommandArgument("target") targetName : String) {
+    fun handle(player: Player, @CommandArgument("target") targetName: String) {
 
         val target = Bukkit.getOfflinePlayer(targetName)
 

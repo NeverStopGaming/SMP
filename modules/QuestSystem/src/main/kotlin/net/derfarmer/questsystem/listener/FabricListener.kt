@@ -25,26 +25,27 @@ object FabricListener : Listener {
 
     @Suppress("UnstableApiUsage")
     @EventHandler
-    fun onInteract(e : PlayerInteractEvent) {
-        if(!e.hasItem()) return
-        if(!e.action.isRightClick) return
-        if(!e.item!!.itemMeta.customModelDataComponent.strings.contains("quest_book")) return
+    fun onInteract(e: PlayerInteractEvent) {
+        if (!e.hasItem()) return
+        if (!e.action.isRightClick) return
+        if (!e.item!!.itemMeta.customModelDataComponent.strings.contains("quest_book")) return
 
         FabricManager.openBook(e.player)
     }
 
-    val questBook = ItemBuilder(Material.BOOK).displayName(Message.get("questbook.name", withPrefix = false)).setCustomModelData("quest_book").build()
+    val questBook = ItemBuilder(Material.BOOK).displayName(Message.get("questbook.name", withPrefix = false))
+        .setCustomModelData("quest_book").build()
 
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
-        if(!e.player.hasPlayedBefore()) {
+        if (!e.player.hasPlayedBefore()) {
             e.player.inventory.setItem(8, questBook)
             Bukkit.getOnlinePlayers().forEach { player ->
                 player.playSound(player.location, Sound.ENTITY_CHICKEN_EGG, 1.0f, 1.0f)
             }
         }
 
-        PlayerModule.plugin.launch (PlayerModule.plugin.entityDispatcher(e.player)) {
+        PlayerModule.plugin.launch(PlayerModule.plugin.entityDispatcher(e.player)) {
             delay(1000 * 3)
             if (FabricManager.isFabricPlayer(e.player)) return@launch
             e.player.kick(Message.get("kick.modNotInstalled", withPrefix = false))

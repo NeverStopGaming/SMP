@@ -3,7 +3,6 @@ package net.derfarmer.playersystem
 import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import net.derfarmer.moduleloader.*
-import net.derfarmer.playersystem.PlayerManager.setBannedTime
 import net.derfarmer.playersystem.clan.Clan
 import net.derfarmer.playersystem.clan.ClanManager
 import net.derfarmer.playersystem.clan.ClanRank
@@ -75,7 +74,7 @@ object PlayerManager {
         }
 
         @EventHandler
-        fun onQuit(event : PlayerQuitEvent) {
+        fun onQuit(event: PlayerQuitEvent) {
             if (isBanned(event.player)) {
                 event.quitMessage(Component.empty())
             }
@@ -140,11 +139,11 @@ object PlayerManager {
                 p.kick(p.getMSG("ban.perma", withPrefix = false))
             }
 
-            val zoneId =ZoneId.of("Europe/Berlin")
+            val zoneId = ZoneId.of("Europe/Berlin")
             val time = Instant.ofEpochSecond(event.timestamp).atZone(zoneId).toLocalDateTime()
 
             if (LocalDateTime.now().isAfter(time)) {
-                PlayerModule.plugin.launch (PlayerModule.plugin.entityDispatcher(p)) {
+                PlayerModule.plugin.launch(PlayerModule.plugin.entityDispatcher(p)) {
                     setBannedTime(p, 0L)
                     p.kick(Component.text("Rejoin"))
                 }
@@ -153,7 +152,7 @@ object PlayerManager {
 
             val germanFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMANY)
 
-            PlayerModule.plugin.launch (PlayerModule.plugin.entityDispatcher(p)){
+            PlayerModule.plugin.launch(PlayerModule.plugin.entityDispatcher(p)) {
                 p.kick(p.getMSG("ban.time", time.format(germanFormatter), withPrefix = false))
             }
         }

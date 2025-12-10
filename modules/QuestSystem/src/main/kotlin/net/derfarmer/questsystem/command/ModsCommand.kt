@@ -12,7 +12,10 @@ import org.bukkit.entity.Player
 object ModsCommand : Command("mods") {
 
     @CommandSubPath("<targetName>", "fabric.mods")
-    fun handle(player: Player, @CommandArgument("targetName", PlayerCommandSuggestionProvider::class) targetName : String) {
+    fun handle(
+        player: Player,
+        @CommandArgument("targetName", PlayerCommandSuggestionProvider::class) targetName: String
+    ) {
 
         val target = Bukkit.getPlayer(targetName)
 

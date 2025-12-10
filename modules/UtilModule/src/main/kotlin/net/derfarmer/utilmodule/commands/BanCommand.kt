@@ -16,7 +16,7 @@ import kotlin.time.toJavaDuration
 object BanCommand : Command("ban") {
 
     override fun execute(sender: CommandSender, commandLabel: String, args: Array<String>): Boolean {
-        if(sender !is Player) return false
+        if (sender !is Player) return false
 
         if (!sender.hasPermission("EV1System.ban") || !sender.isOp) {
             return false
@@ -35,16 +35,19 @@ object BanCommand : Command("ban") {
                 return false
             }
 
-            PlayerManager.setBannedTime(target, LocalDateTime.now().plus(duration.toJavaDuration()).toEpochSecond(
-                ZoneOffset.ofHours(1)))
+            PlayerManager.setBannedTime(
+                target, LocalDateTime.now().plus(duration.toJavaDuration()).toEpochSecond(
+                    ZoneOffset.ofHours(1)
+                )
+            )
 
             sender.sendMSG("ban.banned", target.name.toString())
 
-            if(target !is Player) return true
+            if (target !is Player) return true
 
             Bukkit.getPluginManager().callEvent(PlayerBannedEvent(target, getBannedTime(target)))
 
-        } catch (e : NullPointerException) {
+        } catch (e: NullPointerException) {
             sender.sendMSG("ban.notFound")
             return false
         }

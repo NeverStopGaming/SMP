@@ -1,7 +1,10 @@
 package de.nick.elevatorsystem
 
 import de.nick.elevatorsystem.command.SpawnLauncherCommand
-import de.nick.elevatorsystem.listener.*
+import de.nick.elevatorsystem.listener.BlockBreakListener
+import de.nick.elevatorsystem.listener.BlockPlaceListener
+import de.nick.elevatorsystem.listener.InventoryClickListener
+import de.nick.elevatorsystem.listener.InventoryListener
 import de.nick.elevatorsystem.listener.player.PlayerInteractListener
 import de.nick.elevatorsystem.listener.player.PlayerJumpListener
 import de.nick.elevatorsystem.listener.player.PlayerMoveListener
@@ -29,10 +32,12 @@ object ElevatorModule : Module() {
         elevatorRecipe.setIngredient('E', Material.DAYLIGHT_DETECTOR)
         elevatorRecipe.setIngredient('N', Material.ENDER_PEARL)
 
-        val elytraLauncherRecipe = ShapedRecipe(NamespacedKey("ev1", "elytralauncher_recipe"),
+        val elytraLauncherRecipe = ShapedRecipe(
+            NamespacedKey("ev1", "elytralauncher_recipe"),
             ItemBuilder(Material.DISPENSER).setDisplayName("§l§2Elytra Launcher")
                 .setLore("§3Platziere den Elytra Launcher mit dem Loch nach oben und befülle ihn mit Treibstoff\", \"§3Anschließend kannst du dich boosten lassen, indem du sneakst.")
-                .setData("ev1", "elytra_launcher", 1).build())
+                .setData("ev1", "elytra_launcher", 1).build()
+        )
 
         elytraLauncherRecipe.shape("***", "*A*", "*B*")
         elytraLauncherRecipe.setIngredient('*', Material.FIREWORK_ROCKET)
