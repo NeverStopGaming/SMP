@@ -1,6 +1,9 @@
 package net.derfarmer.playersystem
 
+import com.github.shynixn.mccoroutine.folia.entityDispatcher
+import com.github.shynixn.mccoroutine.folia.launch
 import net.derfarmer.moduleloader.*
+import net.derfarmer.playersystem.PlayerManager.setBannedTime
 import net.derfarmer.playersystem.clan.Clan
 import net.derfarmer.playersystem.clan.ClanManager
 import net.derfarmer.playersystem.clan.ClanRank
@@ -12,6 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,9 +32,9 @@ object PlayerManager {
     fun getClan(player: Player) = ClanManager.getClan(getClanName(player))
     private fun setClanName(player: Player, clanName: String) = setPlayerValue(player, "clan", clanName)
 
-    fun getBannedTime(player: Player): Long = (getPlayerValue(player, "banned") ?: "0").toLong()
-    fun isBanned(player: Player): Boolean = getBannedTime(player) != 0L
-    fun setBannedTime(player: Player, time: Long): Long? = setPlayerValue(player, "clan", time.toString())
+    fun getBannedTime(player: OfflinePlayer): Long = (getPlayerValue(player, "banned") ?: "0").toLong()
+    fun isBanned(player: OfflinePlayer): Boolean = getBannedTime(player) != 0L
+    fun setBannedTime(player: OfflinePlayer, time: Long): Long? = setPlayerValue(player, "banned", time.toString())
 
     private fun setSuffix(player: Player, clan: Clan?) {
         if (clan == null) {
@@ -51,10 +55,11 @@ object PlayerManager {
             val player = event.player
 
             if (isBanned(player)) {
-                event.joinMessage(null)
+                event.joinMessage(Component.empty())
                 Bukkit.getPluginManager().callEvent(PlayerBannedEvent(player, getBannedTime(player)))
                 return
             }
+            event.joinMessage(Message["join", event.player.name])
 
             val clanName = getClanName(player)
             val clan = ClanManager.getClan(clanName)
@@ -67,6 +72,14 @@ object PlayerManager {
             }
 
             setSuffix(player, clan)
+        }
+
+        @EventHandler
+        fun onQuit(event : PlayerQuitEvent) {
+            if (isBanned(event.player)) {
+                event.quitMessage(Component.empty())
+            }
+            event.quitMessage(Message["leave", event.player.name])
         }
 
         @EventHandler
@@ -127,16 +140,22 @@ object PlayerManager {
                 p.kick(p.getMSG("ban.perma", withPrefix = false))
             }
 
-            val date = LocalDateTime.ofInstant(Instant.ofEpochMilli(event.timestamp), ZoneId.of("Europe/Berlin"))
+            val zoneId =ZoneId.of("Europe/Berlin")
+            val time = Instant.ofEpochSecond(event.timestamp).atZone(zoneId).toLocalDateTime()
 
-            if (date.isAfter(LocalDateTime.now())) {
-                setBannedTime(p, 0L)
+            if (LocalDateTime.now().isAfter(time)) {
+                PlayerModule.plugin.launch (PlayerModule.plugin.entityDispatcher(p)) {
+                    setBannedTime(p, 0L)
+                    p.kick(Component.text("Rejoin"))
+                }
                 return
             }
 
             val germanFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm", Locale.GERMANY)
 
-            p.kick(p.getMSG("ban.time", date.format(germanFormatter), withPrefix = false))
+            PlayerModule.plugin.launch (PlayerModule.plugin.entityDispatcher(p)){
+                p.kick(p.getMSG("ban.time", time.format(germanFormatter), withPrefix = false))
+            }
         }
 
         private fun sendToAllClanMember(clan: Clan, message: Component) {
