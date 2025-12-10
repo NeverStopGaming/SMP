@@ -106,15 +106,11 @@ object ModuleManager {
     fun disableAllModules() = modules.forEach { disableModule(it) }
 
     fun reloadModules() {
-
-        val plugin = Bukkit.getPluginManager().plugins.first { it.name == "ModuleLoader" } as JavaPlugin
-
         modules.forEach {
-            plugin.launch {
-                it.onReload()
-                disableModule(it)
-            }
-            loadModulesFromFiles()
+            it.onReload()
+            //disableModule(it)
         }
+
+        loadModulesFromFiles()
     }
 }
