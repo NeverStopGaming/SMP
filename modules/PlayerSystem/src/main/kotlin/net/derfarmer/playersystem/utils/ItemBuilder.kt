@@ -13,6 +13,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionType
 import java.util.*
 
+@Suppress("UnstableApiUsage")
 class ItemBuilder(material: Material?) {
     private var stack: ItemStack
     private val meta: ItemMeta
@@ -125,6 +126,14 @@ class ItemBuilder(material: Material?) {
 
     fun setData(namespace: String, key: String, lvl: Int): ItemBuilder {
         meta.persistentDataContainer.set(NamespacedKey(namespace, key), PersistentDataType.INTEGER, lvl)
+        setItemMeta(meta)
+        return this
+    }
+
+    fun setCustomModelData(string: String) : ItemBuilder {
+        val model = meta.customModelDataComponent
+        model.strings = listOf(string)
+        meta.setCustomModelDataComponent(model)
         setItemMeta(meta)
         return this
     }
