@@ -1,0 +1,7 @@
+{
+  "name": "WaypointShareModule",
+  "main": "de.nick.waypointsharesystem.WaypointShareModule",
+  "authors": [
+    "nick"
+  ]
+}
