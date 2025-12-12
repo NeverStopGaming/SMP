@@ -1,14 +1,15 @@
 package de.nick.waypointsharesystem
 
+import de.nick.waypointsharesystem.listener.ChatListener
+import de.nick.waypointsharesystem.listener.InventoryClickListener
 import net.derfarmer.moduleloader.modules.Module
-import net.derfarmer.playersystem.utils.ItemBuilder
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.inventory.ShapedRecipe
 
 object WaypointShareModule : Module() {
     override fun onEnable() {
-        i
+        println("EV WaypointShare loading")
+        register(ChatListener)
+        register(InventoryClickListener)
+        println("EV WaypointShare Enabled")
     }
 
     override fun onDisable() {

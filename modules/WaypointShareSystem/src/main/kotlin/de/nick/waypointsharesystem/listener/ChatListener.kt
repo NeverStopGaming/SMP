@@ -1,11 +1,12 @@
 package de.nick.waypointsharesystem.listener
 
-import com.github.benderfarmer.Config
-import com.github.benderfarmer.manager.getClan
-import com.github.benderfarmer.utils.ItemBuilder
-import com.github.benderfarmer.waypointshare.utils.ShareInventory
-import com.github.benderfarmer.waypointshare.utils.SkullBuilder
+import de.nick.waypointsharesystem.WaypointShareModule
+import de.nick.waypointsharesystem.utils.ShareInventory
+import de.nick.waypointsharesystem.utils.SkullBuilder
 import io.papermc.paper.event.player.AsyncChatEvent
+import net.derfarmer.moduleloader.sendMSG
+import net.derfarmer.playersystem.PlayerManager
+import net.derfarmer.playersystem.utils.ItemBuilder
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -34,16 +35,16 @@ object ChatListener : Listener {
 
             if (targetPlayer != null && targetPlayer.isOnline) {
 
-                targetPlayer.sendMessage("")
-                targetPlayer.sendMessage("${Config.prefix}§7Der Spieler §a" + event.player.name + " §7hat dir ein §aWaypoint §7geschickt")
-                targetPlayer.sendMessage(getLastWaypointMessage(event.player.uniqueId).toString())
-                targetPlayer.sendMessage("")
+                targetPlayer.sendMSG("")
+                targetPlayer.sendMSG("waypointshare.send.privat.message", event.player.name)
+                targetPlayer.sendMSG("waypointshare.send.privat.waypointmessage", getLastWaypointMessage(event.player.uniqueId).toString())
+                targetPlayer.sendMSG("")
                 targetPlayer.playSound(targetPlayer.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
 
-                event.player.sendMessage("${Config.prefix}§7Du hast §aerfolgreich §7den Waypoint an den Spieler §a" + targetPlayer.name + " §7geschickt")
+                event.player.sendMessage("§7Du hast §aerfolgreich §7den Waypoint an den Spieler §a" + targetPlayer.name + " §7geschickt")
                 return
             }
-            event.player.sendMessage("${Config.prefix}§7Der Spieler §a" + messagesString + " §7ist §cnicht §7online")
+            event.player.sendMSG("waypointshare.player.notOnline", messagesString)
             event.player.playSound(event.player.location, Sound.BLOCK_GLASS_BREAK, 10.0F, 10.0F)
         }
 
@@ -70,20 +71,18 @@ object ChatListener : Listener {
             .setSkullOwner("bdde594dead88b35bc21ad1ab238dcae411253e34a585d925258ce674c642617")
             .build())
 
-        if (event.player.getClan() == "") {
-
+        if (PlayerManager.getClanName(event.player).isBlank()) {
             sendInventory.setItem(16, SkullBuilder()
                 .setDisplayName("§2Du bist leider in keinem Clan")
                 .setSkullOwner("4a2fe01a1f7d76f3cd6ddb53d5325a398ad748d718ae720a6bc23382867d6531")
                 .build())
 
 
-            Bukkit.getRegionScheduler().execute(WaypointShare.plugin, event.player.location) {
+            Bukkit.getRegionScheduler().execute(WaypointShareModule.plugin, event.player.location) {
                 event.player.openInventory(sendInventory)
             }
             return
         }
-
 
         sendInventory.setItem(16, SkullBuilder()
             .setDisplayName("§2Schicke den §a§lWaypoint §2nur an Clanmitglieder.")
@@ -91,7 +90,7 @@ object ChatListener : Listener {
             .build())
 
 
-        Bukkit.getRegionScheduler().execute(WaypointShare.plugin, event.player.location) {
+        Bukkit.getRegionScheduler().execute(WaypointShareModule.plugin, event.player.location) {
             event.player.openInventory(sendInventory)
             event.player.playSound(event.player.location, Sound.BLOCK_CHEST_OPEN, 10.0F, 10.0F)
         }

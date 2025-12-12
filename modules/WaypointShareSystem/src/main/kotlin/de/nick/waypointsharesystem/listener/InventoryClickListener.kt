@@ -1,5 +1,17 @@
 package de.nick.waypointsharesystem.listener
 
+import de.nick.waypointsharesystem.utils.ShareInventory
+import net.derfarmer.moduleloader.sendMSG
+import net.derfarmer.playersystem.PlayerManager
+import net.derfarmer.playersystem.clan.ClanManager
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.Sound
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.inventory.InventoryClickEvent
+
 object InventoryClickListener : Listener {
 
     @EventHandler
@@ -17,50 +29,53 @@ object InventoryClickListener : Listener {
         when(event.slot) {
             10 -> {
                 if (ChatListener.playerWaypointWaiting.contains(player)) {
-                    player.sendMessage("${Config.prefix}§7Schreibe den Spielernamen in den Chat.")
+                    player.closeInventory()
+                    player.sendMSG("waypointshare.type.playername.inchat")
                     player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
                     return
                 }
                 ChatListener.playerWaypointWaiting.add(player)
-                player.sendMessage("${Config.prefix}§7Schreibe den Spielernamen in den Chat.")
+                player.sendMSG("waypointshare.type.playername.inchat")
                 player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
             }
             13 -> {
                 ChatListener.playerWaypointMessages.remove(player.uniqueId)
-                Bukkit.broadcast(Component.text(""))
-                Bukkit.broadcast(Component.text("${Config.prefix}§7Der Spieler §a" + player.name + " §7hat ein §aWaypoint §7geteilt"))
-                Bukkit.broadcast(Component.text(waypointMessage))
-                Bukkit.broadcast(Component.text(""))
-                player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+
+                Bukkit.getOnlinePlayers().forEach { onlinePlayer ->
+                    onlinePlayer.sendMSG("")
+                    onlinePlayer.sendMSG("waypointshare.send.global.message", player.name)
+                    onlinePlayer.sendMSG("waypointshare.waypointMessage", waypointMessage)
+                    onlinePlayer.sendMSG("")
+                    onlinePlayer.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+                }
             }
             16 -> {
                 ChatListener.playerWaypointMessages.remove(player.uniqueId)
-                if (player.getClan() == "") {
+                if (PlayerManager.getClanName(player).isBlank()) {
 
-                    player.sendMessage("${Config.prefix}§7Du bist aktuell in §ckeinem §7Clan")
+                    player.sendMSG("waypointshare.you.not.clan")
                     player.playSound(player.location, Sound.BLOCK_GLASS_BREAK, 10.0F, 10.0F)
                     return
                 }
 
-                ClanManager.sendMessage(player, "<green>" + player.name + " <gray>hat ein Waypoint geteilt");
-                ClanManager.sendMessage(player, waypointMessage)
 
-                Bukkit.getOnlinePlayers().forEach { onlinePlayer ->
-                    if (onlinePlayer.getClan() == player.getClan()) {
+                val clan = PlayerManager.getClan(player)
 
-                        onlinePlayer.playSound(onlinePlayer.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+                if (clan != null) {
+
+                    ClanManager.sendClanMessage(player, clan, Component.text("hat ein waypoint geteilt"))
+                    ClanManager.sendClanMessage(player, clan, Component.text(waypointMessage))
+
+                    Bukkit.getOnlinePlayers().forEach { onlinePlayer ->
+                        if (PlayerManager.getClan(onlinePlayer) == PlayerManager.getClan(player)) {
+                            onlinePlayer.playSound(onlinePlayer.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+                        }
                     }
                 }
 
-            }
-        }
-
-        WaypointShare.plugin.launch {
-            delay(5)
-            withContext(WaypointShare.plugin.entityDispatcher(player)) {
                 player.closeInventory()
+
             }
         }
     }
-
 }
