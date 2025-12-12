@@ -32,11 +32,13 @@ object InventoryClickListener : Listener {
                     player.closeInventory()
                     player.sendMSG("waypointshare.type.playername.inchat")
                     player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+                    player.closeInventory()
                     return
                 }
                 ChatListener.playerWaypointWaiting.add(player)
                 player.sendMSG("waypointshare.type.playername.inchat")
                 player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 10.0F, 10.0F)
+                player.closeInventory()
             }
             13 -> {
                 ChatListener.playerWaypointMessages.remove(player.uniqueId)
