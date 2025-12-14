@@ -26,6 +26,7 @@
             <option value="$PROJECT_DIR$/modules/ElevatorSystem" />
             <option value="$PROJECT_DIR$/modules/PlayerSystem" />
             <option value="$PROJECT_DIR$/modules/QuestSystem" />
+            <option value="$PROJECT_DIR$/modules/SpawnModule" />
             <option value="$PROJECT_DIR$/modules/UtilModule" />
             <option value="$PROJECT_DIR$/modules/VoiceChatModule" />
             <option value="$PROJECT_DIR$/modules/WebModule" />
