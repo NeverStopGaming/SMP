@@ -24,7 +24,7 @@ object CCCommand : Command("cc", alias = arrayOf("clanchat")) {
             return false
         }
 
-        ClanManager.sendClanMessage(sender, clan, Component.text(args.joinToString { " " }))
+        ClanManager.sendClanMessage(sender, clan, Component.text(args.joinToString(" ")))
 
         return true
     }
