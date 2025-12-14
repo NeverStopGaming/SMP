@@ -5,6 +5,7 @@ import net.derfarmer.moduleloader.gson
 import net.derfarmer.questsystem.QuestDataManager.SERVER_QUEST_NAME
 import net.derfarmer.questsystem.QuestDataManager.getQuestData
 import net.derfarmer.questsystem.quest.*
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
 object QuestManager {
@@ -53,12 +54,20 @@ object QuestManager {
     }
 
     fun getPlayerCategories(player: Player): Map<Int, Int> {
-        val map = mutableMapOf<Int, Int>()
+        val tree = QuestDataManager.getPlayerTree(player.uniqueId.toString())
+
+        val map = mutableMapOf(1 to 0, 2 to if (tree.getOrDefault(101, false)) 0 else -1,
+        3 to if (tree.getOrDefault(102, false)) 0 else -1,4 to if (tree.getOrDefault(103, false)) 0 else -1,
+            5 to if (tree.getOrDefault(104, false)) 0 else -1,6 to if (tree.getOrDefault(105, false)) 0 else -1,
+            7 to if (tree.getOrDefault(106, false)) 0 else -1,8 to if (tree.getOrDefault(107, false)) 0 else -1,
+            9 to if (tree.getOrDefault(108, false)) 0 else -1, 10 to 0)
         return map
     }
 
-    fun completeQuest(player: Player, quest: DBQuest, name: String) {
-        db.hset(QuestDataManager.QUEST_TREE_DATA_DB_KEY + name, quest.id.toString(), "true")
+    fun completeQuest(player: OfflinePlayer, quest: DBQuest) {
+        db.hset(QuestDataManager.QUEST_TREE_DATA_DB_KEY + player.uniqueId, quest.id.toString(), "true")
+
+        if (player !is Player) return
         FabricManager.sendToast(player, "Quest Abgeschlossen", quest.title)
         QuestDataManager.initTrackers(player)
     }

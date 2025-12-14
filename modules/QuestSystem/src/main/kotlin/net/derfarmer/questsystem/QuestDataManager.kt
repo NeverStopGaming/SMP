@@ -1,6 +1,5 @@
 package net.derfarmer.questsystem
 
-import com.github.shynixn.mccoroutine.folia.entityDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import net.derfarmer.moduleloader.Redis.db
 import net.derfarmer.moduleloader.gson
@@ -13,120 +12,144 @@ import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import kotlin.math.min
 
-object QuestDataManager {
-    val playerHaveItem = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
-    val playerCraftItem = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
-    val playerBreakBlock = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
-    val playerKillMob = hashMapOf<Player, HashMap<EntityType, MutableList<QuestTracker>>>()
+object QuestDataManager : Listener {
+    val haveItemMap = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
+    val craftItemMap = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
+    val breakBlockMap = hashMapOf<Player, HashMap<Material, MutableList<QuestTracker>>>()
+    val killMobMap = hashMapOf<Player, HashMap<EntityType, MutableList<QuestTracker>>>()
 
-    fun haveItem(player: Player, item: ItemStack) {
-        plugin.launch(plugin.entityDispatcher(player)) {
-            val map = playerHaveItem.getOrDefault(player, null) ?: return@launch
+    fun onClose(player: Player) {
+        synchronized(haveItemMap) {
 
-            val trackers = map.getOrDefault(item.type, null) ?: return@launch
+            val map = haveItemMap[player] ?: return
+            val itemMap = hashMapOf<Material, Int>()
 
-            for (tracker in trackers) {
+            for (item in player.inventory) {
+                if (item == null) continue
 
-                val amount = player.inventory.sumOf { if (it != null && it.type == item.type) it.amount else 0 }
+                if (!map.contains(item.type)) continue
 
-                run {
-                    val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
+                val value = itemMap[item.type]
 
-                    db.hset(
-                        "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
-                        amount.toString()
-                    )
+                if (value == null) {
+                    itemMap[item.type] = 0
+                } else {
+                    itemMap[item.type] = value + item.amount
+                }
+            }
 
-                    if (!player.inventory.contains(item.type, tracker.amount)) {
+            for ((material, amount) in itemMap) {
+                for (tracker in map[material]!!) {
+                    if (!player.inventory.contains(material, tracker.amount)) {
                         db.hset(
-                            "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
+                            "$QUEST_DATA_DB_KEY${player.uniqueId}_${tracker.questID}",
+                            tracker.conditionID.toString(),
                             amount.toString()
                         )
-                        continue
                     } else {
                         db.hset(
-                            "$QUEST_DATA_DB_KEY${name}_${tracker.questID}",
+                            "$QUEST_DATA_DB_KEY${player.uniqueId}_${tracker.questID}",
                             tracker.conditionID.toString(),
                             tracker.amount.toString()
                         )
                     }
-                    playerHaveItem[player]?.get(item.type)?.remove(tracker)
+                    haveItemMap[player]?.get(material)?.remove(tracker)
                     completeTracker(player, tracker)
                 }
             }
         }
     }
 
-    fun craftItem(player: Player, item: ItemStack) {
-        plugin.launch(plugin.entityDispatcher(player)) {
-            val map = playerCraftItem.getOrDefault(player, null) ?: return@launch
+    fun haveItem(player: Player, item: ItemStack) {
+        synchronized(haveItemMap) {
+            val map = haveItemMap.getOrDefault(player, null) ?: return
 
-            val trackers = map.getOrDefault(item.type, null) ?: return@launch
+            val trackers = map.getOrDefault(item.type, null) ?: return
 
-            for (tracker in trackers) {
-                run {
-                    val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
+            synchronized(map) {
+                synchronized(trackers) {
+                    for (tracker in trackers) {
+                        val amount =
+                            player.inventory.sumOf { if (it != null && it.type == item.type) it.amount else 0 }
 
-                    val newValue = db.hincrBy(
-                        "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
-                        1
-                    )
+                        val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
 
-                    if (newValue < tracker.amount) continue
+                        db.hset(
+                            "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
+                            amount.toString()
+                        )
 
-                    playerCraftItem[player]?.get(item.type)?.remove(tracker)
-                    completeTracker(player, tracker)
+                        if (!player.inventory.contains(item.type, tracker.amount)) {
+                            db.hset(
+                                "$QUEST_DATA_DB_KEY${name}_${tracker.questID}",
+                                tracker.conditionID.toString(),
+                                amount.toString()
+                            )
+                            continue
+                        } else {
+                            db.hset(
+                                "$QUEST_DATA_DB_KEY${name}_${tracker.questID}",
+                                tracker.conditionID.toString(),
+                                tracker.amount.toString()
+                            )
+                        }
+                        haveItemMap[player]?.get(item.type)?.remove(tracker)
+                        completeTracker(player, tracker)
+                    }
                 }
             }
         }
     }
 
     fun killMob(player: Player, entity: Entity) {
-        plugin.launch(plugin.entityDispatcher(player)) {
-            val map = playerKillMob.getOrDefault(player, null) ?: return@launch
+        synchronized(killMobMap) {
+            val map = killMobMap.getOrDefault(player, null) ?: return
+            synchronized(map) {
 
-            val trackers = map.getOrDefault(entity.type, null) ?: return@launch
+                val trackers = map.getOrDefault(entity.type, null) ?: return
 
-            for (tracker in trackers) {
-                run {
-                    val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
+                synchronized(trackers) {
+                    for (tracker in trackers) {
+                        synchronized(tracker) {
+                            val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
 
-                    val newValue = db.hincrBy(
-                        "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
-                        1
-                    )
+                            val newValue = db.hincrBy(
+                                "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
+                                1
+                            )
 
-                    if (newValue < tracker.amount) continue
+                            if (newValue < tracker.amount) continue
 
-                    playerKillMob[player]?.get(entity.type)?.remove(tracker)
-                    completeTracker(player, tracker)
+                            killMobMap[player]?.get(entity.type)?.remove(tracker)
+                            completeTracker(player, tracker)
+                        }
+                    }
                 }
             }
         }
     }
 
     fun breakBlock(player: Player, material: Material) {
-        plugin.launch(plugin.entityDispatcher(player)) {
-            val map = playerBreakBlock.getOrDefault(player, null) ?: return@launch
-            val trackers = map.getOrDefault(material, null) ?: return@launch
+        synchronized(breakBlockMap) {
+            val map = breakBlockMap.getOrDefault(player, null) ?: return
+            val trackers = map.getOrDefault(material, null) ?: return
 
             for (tracker in trackers) {
-                run {
-                    val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
+                val name = if (tracker.isServer) SERVER_QUEST_NAME else player.uniqueId.toString()
 
-                    val newValue = db.hincrBy(
-                        "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
-                        1
-                    )
+                val newValue = db.hincrBy(
+                    "$QUEST_DATA_DB_KEY${name}_${tracker.questID}", tracker.conditionID.toString(),
+                    1
+                )
 
-                    if (newValue < tracker.amount) continue
+                if (newValue < tracker.amount) continue
 
-                    playerBreakBlock[player]?.get(material)?.remove(tracker)
-                    completeTracker(player, tracker)
-                }
+                breakBlockMap[player]?.get(material)?.remove(tracker)
+                completeTracker(player, tracker)
             }
         }
     }
@@ -154,26 +177,26 @@ object QuestDataManager {
                 newAmount.toLong()
             )
 
-            FabricManager.sendQuest(
-                player, Quest(
-                    quest.id, quest.title, quest.description, quest.description2, quest.rewards,
-                    quest.conditions.withIndex().map { (_: Int, it: DBQuestCondition) ->
-                        QuestCondition(
-                            it.type,
-                            it.id,
-                            it.amount,
-                            newValue.toInt(),
-                            it.tooltip
-                        )
-                    })
-            )
-
             player.inventory.remove(ItemStack(material, newAmount))
 
             if (newValue < condition.amount) continue
 
-            QuestManager.completeQuest(player, quest, name)
+            val data = getQuestData(questId, name)
+
+            for ((i: Int, condition: DBQuestCondition) in quest.conditions.withIndex()) {
+                if (data.getOrDefault(i, 0) < condition.amount) return
+            }
+
+            if (quest.isServerQuest) {
+                Bukkit.getOfflinePlayers().forEach {
+                    QuestManager.completeQuest(it, quest)
+                }
+            } else {
+                QuestManager.completeQuest(player, quest)
+            }
         }
+
+        FabricManager.sendQuest(player, QuestManager.getQuest(player, questId))
     }
 
     const val QUEST_DATA_DB_KEY = "qd_"
@@ -207,11 +230,11 @@ object QuestDataManager {
         }
 
         if (tracker.isServer) {
-            Bukkit.getOnlinePlayers().forEach {
-                QuestManager.completeQuest(it, quest, name)
+            Bukkit.getOfflinePlayers().forEach {
+                QuestManager.completeQuest(it, quest)
             }
         } else {
-            QuestManager.completeQuest(player, quest, name)
+            QuestManager.completeQuest(player, quest)
         }
     }
 
@@ -250,38 +273,44 @@ object QuestDataManager {
         questId: Int,
         conditionID: Int
     ) {
-        val tracker = QuestTracker(questId, conditionID, isServerQuest, condition.amount)
+        plugin.launch {
+            val tracker = QuestTracker(questId, conditionID, isServerQuest, condition.amount)
 
-        when (condition.type) {
-            QuestConditionType.KILL_MOB -> {
-                val entityType = try {
-                    EntityType.valueOf(condition.id.uppercase())
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Invalid entity type id='${condition.id}'", e)
+            when (condition.type) {
+                QuestConditionType.KILL_MOB -> {
+                    val entityType = try {
+                        EntityType.valueOf(condition.id.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        throw IllegalArgumentException("Invalid entity type id='${condition.id}'", e)
+                    }
+
+                    synchronized(killMobMap) {
+                        val mapForPlayer = killMobMap.getOrPut(player) { HashMap() }
+                        mapForPlayer.getOrPut(entityType) { mutableListOf() }.add(tracker)
+                    }
                 }
 
-                val mapForPlayer = playerKillMob.getOrPut(player) { HashMap() }
-                mapForPlayer.getOrPut(entityType) { mutableListOf() }.add(tracker)
-            }
+                QuestConditionType.BREAK_BLOCK,
+                QuestConditionType.CRAFT_ITEM,
+                QuestConditionType.HAVE_ITEM -> {
+                    val material = Material.matchMaterial(condition.id)
+                        ?: throw IllegalArgumentException("Invalid material id='${condition.id}'")
 
-            QuestConditionType.BREAK_BLOCK,
-            QuestConditionType.CRAFT_ITEM,
-            QuestConditionType.HAVE_ITEM -> {
-                val material = Material.matchMaterial(condition.id)
-                    ?: throw IllegalArgumentException("Invalid material id='${condition.id}'")
+                    val map = when (condition.type) {
+                        QuestConditionType.CRAFT_ITEM -> craftItemMap
+                        QuestConditionType.BREAK_BLOCK -> breakBlockMap
+                        QuestConditionType.HAVE_ITEM -> haveItemMap
+                        else -> throw IllegalArgumentException("Unsupported player condition: ${condition.type}")
+                    }
 
-                val map = when (condition.type) {
-                    QuestConditionType.CRAFT_ITEM -> playerCraftItem
-                    QuestConditionType.BREAK_BLOCK -> playerBreakBlock
-                    QuestConditionType.HAVE_ITEM -> playerHaveItem
-                    else -> throw IllegalArgumentException("Unsupported player condition: ${condition.type}")
+                    synchronized(map) {
+                        val materialMap = map.getOrPut(player) { HashMap() }
+                        materialMap.getOrPut(material) { mutableListOf() }.add(tracker)
+                    }
                 }
 
-                val materialMap = map.getOrPut(player) { HashMap() }
-                materialMap.getOrPut(material) { mutableListOf() }.add(tracker)
+                else -> throw IllegalArgumentException("Unsupported player condition: ${condition.type}")
             }
-
-            else -> throw IllegalArgumentException("Unsupported player condition: ${condition.type}")
         }
     }
 }

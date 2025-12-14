@@ -1,5 +1,8 @@
 package net.derfarmer.questsystem.listener
 
+import com.github.shynixn.mccoroutine.folia.entityDispatcher
+import com.github.shynixn.mccoroutine.folia.launch
+import net.derfarmer.questsystem.QuestModule.plugin
 import net.derfarmer.questsystem.QuestDataManager
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -7,41 +10,28 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
-import org.bukkit.event.inventory.CraftItemEvent
-import org.bukkit.event.inventory.InventoryMoveItemEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.PlayerInventory
-import kotlin.time.measureTime
-
 
 object QuestListener : Listener {
 
     @EventHandler
     fun onItem(event: EntityPickupItemEvent) {
         if (event.entity !is Player) return
-
-        QuestDataManager.haveItem(event.entity as Player, event.item.itemStack)
+        plugin.launch(plugin.entityDispatcher(event.entity)) {
+            QuestDataManager.haveItem(event.entity as Player, event.item.itemStack)
+        }
     }
 
     @EventHandler
-    fun onItem(event: InventoryMoveItemEvent) {
-        if (event.destination !is PlayerInventory) return
-        val inv = event.destination as PlayerInventory
+    fun onItem(event: InventoryCloseEvent) {
 
-        if (inv.holder !is Player) return
+        val player = event.player
+        if (player !is Player) return
 
-        QuestDataManager.haveItem(inv.holder as Player, event.item)
-    }
-
-    @EventHandler
-    fun onCraft(event: CraftItemEvent) {
-        if (event.whoClicked !is Player) return
-        val player = event.whoClicked as Player
-        val result: ItemStack = event.recipe.result
-
-        QuestDataManager.craftItem(player, result)
-        QuestDataManager.haveItem(player, result)
+        plugin.launch (plugin.entityDispatcher(player)){
+            QuestDataManager.onClose(player)
+        }
     }
 
     @EventHandler
@@ -58,12 +48,7 @@ object QuestListener : Listener {
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        val timeTaken = measureTime {
-            QuestDataManager.initTrackers(event.player)
-        }
-        event.player.sendMessage("TimeTaken: $timeTaken")
-        println("TimeTaken: $timeTaken")
-
-        //TODO: Check if any server quest were completed
+        QuestDataManager.initTrackers(event.player)
+        //TODO: Check if any server quest were completed only for new players
     }
 }
