@@ -5,12 +5,14 @@ import net.derfarmer.questsystem.command.FabricDataCommand
 import net.derfarmer.questsystem.command.ModsCommand
 import net.derfarmer.questsystem.listener.FabricListener
 import net.derfarmer.questsystem.listener.QuestListener
+import net.derfarmer.questsystem.listener.UnlockListener
 import org.bukkit.Bukkit
 
 object QuestModule : Module() {
     override fun onEnable() {
         register(FabricListener)
         register(QuestListener)
+        register(UnlockListener)
 
         register(FabricDataCommand)
         register(ModsCommand)
