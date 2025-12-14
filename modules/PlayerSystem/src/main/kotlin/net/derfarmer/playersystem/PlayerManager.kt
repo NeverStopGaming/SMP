@@ -127,7 +127,7 @@ object PlayerManager {
 
         @EventHandler
         fun onClanMessage(event: ClanMessageEvent) {
-            val msg = Message["clan.chat.msg", event.sender.name].append(event.message)
+            val msg = Message["clan.chat.msg", event.clan.color,event.clan.name, event.sender.name].append(event.message)
             sendToAllClanMember(event.clan, msg)
         }
 
