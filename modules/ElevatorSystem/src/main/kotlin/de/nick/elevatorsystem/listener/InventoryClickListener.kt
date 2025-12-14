@@ -64,7 +64,7 @@ object InventoryClickListener : Listener {
             return
         }
 
-        if(event.slot == 8) {
+        if (event.slot == 8) {
             event.isCancelled = true
 
             if (!holder.isOwner(player)) {
@@ -94,9 +94,9 @@ object InventoryClickListener : Listener {
         val currentItem = event.currentItem
 
         if (cursorItem.type == Material.NETHERITE_BLOCK) {
-            netheriteBlockCount += if(event.isRightClick) {
+            netheriteBlockCount += if (event.isRightClick) {
                 1
-            }else {
+            } else {
                 cursorItem.amount
             }
         } else if (currentItem != null && currentItem.type == Material.NETHERITE_BLOCK) {

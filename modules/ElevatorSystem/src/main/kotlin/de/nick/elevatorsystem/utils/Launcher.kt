@@ -14,28 +14,33 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.persistence.PersistentDataType
 
-class Launcher (private val block: Dispenser, var level : Int) : InventoryHolder {
+class Launcher(private val block: Dispenser, var level: Int) : InventoryHolder {
 
     private val namespacedAccessLevel = NamespacedKey("ev1", "elytra_launcher_access_level")
     private val namespacedOwner = NamespacedKey("ev1", "elytra_launcher_owner")
 
-    var accessLevel = AccessLevel.valueOf(block.persistentDataContainer.getOrDefault(
-        namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.OWNER.toString()))
+    var accessLevel = AccessLevel.valueOf(
+        block.persistentDataContainer.getOrDefault(
+            namespacedAccessLevel, PersistentDataType.STRING, AccessLevel.OWNER.toString()
+        )
+    )
         set(value) {
             block.persistentDataContainer.set(
-                namespacedAccessLevel, PersistentDataType.STRING, value.toString())
+                namespacedAccessLevel, PersistentDataType.STRING, value.toString()
+            )
             block.update()
             field = value
         }
 
-    private val inv = Bukkit.createInventory(this, InventoryType.DISPENSER,  Component.text("Elytra Launcher Level: $level"))
+    private val inv =
+        Bukkit.createInventory(this, InventoryType.DISPENSER, Component.text("Elytra Launcher Level: $level"))
 
     init {
         buildGUI()
     }
 
     fun buildGUI() {
-        for (i in 0.. 8) {
+        for (i in 0..8) {
             inventory.setItem(i, ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName("§d").build())
         }
 
@@ -54,13 +59,13 @@ class Launcher (private val block: Dispenser, var level : Int) : InventoryHolder
         block.update()
     }
 
-    fun canAccess(player: Player) : Boolean{
+    fun canAccess(player: Player): Boolean {
 
         if (accessLevel == AccessLevel.PUBLIC) return true
 
         val id = block.persistentDataContainer.get(namespacedOwner, PersistentDataType.STRING)
 
-        if(id == null) {
+        if (id == null) {
             block.persistentDataContainer.set(namespacedOwner, PersistentDataType.STRING, player.uniqueId.toString())
             block.update()
             return true
@@ -68,7 +73,7 @@ class Launcher (private val block: Dispenser, var level : Int) : InventoryHolder
 
         if (player.uniqueId.toString() == id) return true
 
-        if(accessLevel != AccessLevel.CLAN) return false
+        if (accessLevel != AccessLevel.CLAN) return false
 
         if (PlayerManager.getClanName(player) == Redis.db.hget("player_$id", "clan")) return true
 

@@ -40,5 +40,6 @@ data class DBQuestCondition(
 
 data class DBQuest(
     val id: Int, val title: String, val description: String, val description2: String,
-    val rewards: List<QuestReward>, val conditions: List<DBQuestCondition>
+    val rewards: List<QuestReward>, val conditions: List<DBQuestCondition>,
+    val isServerQuest: Boolean
 )

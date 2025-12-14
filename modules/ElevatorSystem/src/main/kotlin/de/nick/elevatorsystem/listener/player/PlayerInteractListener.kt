@@ -21,14 +21,23 @@ object PlayerInteractListener : Listener {
         val clickedBlock = event.clickedBlock ?: return
         val player = event.player
         when (clickedBlock.type) {
-            Material.DAYLIGHT_DETECTOR -> handleElevatorInteraction(clickedBlock.state as DaylightDetector, player, event)
+            Material.DAYLIGHT_DETECTOR -> handleElevatorInteraction(
+                clickedBlock.state as DaylightDetector,
+                player,
+                event
+            )
+
             Material.DISPENSER -> handleLauncherInteraction(clickedBlock.state as Dispenser, player, event)
             else -> return
         }
     }
 
 
-    private fun handleElevatorInteraction(elevatorDetector: DaylightDetector, player: Player, event: PlayerInteractEvent) {
+    private fun handleElevatorInteraction(
+        elevatorDetector: DaylightDetector,
+        player: Player,
+        event: PlayerInteractEvent
+    ) {
         val isElevator = elevatorDetector.persistentDataContainer.getOrDefault(
             NamespacedKey("ev1", "elevator"),
             PersistentDataType.BOOLEAN,

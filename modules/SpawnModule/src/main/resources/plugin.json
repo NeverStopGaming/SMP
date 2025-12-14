@@ -1,0 +1,7 @@
+{
+  "name": "SpawnModule",
+  "main": "net.derfarmer.spawn.SpawnModule",
+  "authors": [
+    "DerFarmer"
+  ]
+}

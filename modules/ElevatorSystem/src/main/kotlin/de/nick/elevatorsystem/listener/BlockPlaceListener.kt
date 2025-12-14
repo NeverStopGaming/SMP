@@ -68,7 +68,8 @@ object BlockPlaceListener : Listener {
 
     private fun launcherLvl(item: ItemStack): Int {
         return item.itemMeta.persistentDataContainer.getOrDefault(
-            NamespacedKey("ev1", "elytra_launcher"), PersistentDataType.INTEGER, 0)
+            NamespacedKey("ev1", "elytra_launcher"), PersistentDataType.INTEGER, 0
+        )
     }
 
 
@@ -79,7 +80,8 @@ object BlockPlaceListener : Listener {
 
             dispenser.persistentDataContainer.set(
                 NamespacedKey("ev1", "elytra_launcher"),
-                PersistentDataType.INTEGER, launcherLvl(event.itemInHand))
+                PersistentDataType.INTEGER, launcherLvl(event.itemInHand)
+            )
 
             dispenser.update()
         }
@@ -91,7 +93,8 @@ object BlockPlaceListener : Listener {
             val dispenser = event.blockPlaced.state as Dispenser
             dispenser.persistentDataContainer.set(
                 NamespacedKey("ev1", "elytra_launcher"),
-                PersistentDataType.INTEGER, 100)
+                PersistentDataType.INTEGER, 100
+            )
 
             dispenser.update()
         }

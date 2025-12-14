@@ -1,6 +1,10 @@
 package net.derfarmer.discord.listener
 
+import com.github.shynixn.mccoroutine.folia.entityDispatcher
+import com.github.shynixn.mccoroutine.folia.launch
+import kotlinx.coroutines.withContext
 import net.derfarmer.discord.DiscordManager.discordID
+import net.derfarmer.discord.DiscordModule
 import net.derfarmer.discord.utils.DiscordConfig
 import net.derfarmer.moduleloader.Message
 import org.bukkit.event.EventHandler
@@ -13,7 +17,12 @@ object JoinListener : Listener {
     fun onJoin(event: PlayerJoinEvent) {
         if (!DiscordConfig.whitelistEnabled) return
         if (event.player.discordID.isNotBlank()) return
+        if (event.player.isOp) return
 
-        event.player.kick(Message["discord.registered"])
+        DiscordModule.plugin.launch {
+            withContext(DiscordModule.plugin.entityDispatcher(event.player)) {
+                event.player.kick(Message.get("discord.registered", withPrefix = false))
+            }
+        }
     }
 }

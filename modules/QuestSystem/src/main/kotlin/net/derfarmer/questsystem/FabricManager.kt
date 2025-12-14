@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 object FabricManager {
 
     private val fabricPlayers = mutableListOf<Player>()
+    private val waitOnMSG = mutableMapOf<Player, (String) -> Unit>()
 
     fun isFabricPlayer(player: Player) = fabricPlayers.contains(player)
 
@@ -28,7 +29,11 @@ object FabricManager {
             'c' -> sendCategories(player, QuestManager.getCategories(player))
             'l' -> sendTree(player, QuestManager.getTree(player, data.toInt()))
             'q' -> sendQuest(player, QuestManager.getQuest(player, data.toInt()))
-            's' -> QuestManager.submit(player, data.toInt())
+            's' -> QuestDataManager.submitItem(player, data.toInt())
+            'm' -> {
+                val callback = waitOnMSG.getOrDefault(player, null) ?: return
+                callback(data)
+            }
         }
     }
 
@@ -50,5 +55,14 @@ object FabricManager {
 
     fun sendQuest(player: Player, quest: Quest) {
         sendRaw(player, "q" + gson.toJson(quest))
+    }
+
+    fun openBook(player: Player) {
+        sendRaw(player, "o")
+    }
+
+    fun requestModes(player: Player, callback: (String) -> Unit) {
+        sendRaw(player, "m")
+        waitOnMSG[player] = callback
     }
 }

@@ -9,11 +9,7 @@ import kotlinx.coroutines.launch
 import net.derfarmer.moduleloader.sendMSG
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Particle
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.block.DaylightDetector
 import org.bukkit.block.Dispenser
@@ -87,6 +83,7 @@ object PlayerToggleSneakListener : Listener {
             return
         }
     }
+
     private fun handleElytraLauncher(player: Player, location: Location) {
         val dispenserLocation = location.add(BlockFace.DOWN.direction)
         val dispenserBlock = dispenserLocation.block
@@ -141,9 +138,11 @@ object PlayerToggleSneakListener : Listener {
             1 -> {
                 triggerElytraBoost(player, 2.0)
             }
+
             2 -> {
                 triggerElytraBoost(player, 4.0)
             }
+
             3 -> {
                 triggerElytraBoost(player, 10.0)
             }

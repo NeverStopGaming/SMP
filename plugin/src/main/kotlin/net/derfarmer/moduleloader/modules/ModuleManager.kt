@@ -1,10 +1,8 @@
 package net.derfarmer.moduleloader.modules
 
-import com.github.shynixn.mccoroutine.folia.launch
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.bukkit.Bukkit
-import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URLClassLoader
@@ -106,15 +104,11 @@ object ModuleManager {
     fun disableAllModules() = modules.forEach { disableModule(it) }
 
     fun reloadModules() {
-
-        val plugin = Bukkit.getPluginManager().plugins.first { it.name == "ModuleLoader" } as JavaPlugin
-
         modules.forEach {
-            plugin.launch {
-                it.onReload()
-                disableModule(it)
-            }
-            loadModulesFromFiles()
+            it.onReload()
+            //disableModule(it)
         }
+
+        loadModulesFromFiles()
     }
 }

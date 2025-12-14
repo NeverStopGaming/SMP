@@ -51,7 +51,7 @@ object DiscordManager {
             .setTitle("Du wurdest erfolgreich freigegeben")
             .addField("IP", DiscordConfig.serverIP, false)
             .addField("Client Version", "1.21-1.21.10", false)
-            .addField("Server Version", "1.21.0", false)
+            .addField("Server Version", "1.21.8", false)
             .setFooter("Bitte immer die neuste Version benutzen und halte dich an unser Regelwerk.")
 
         member.user.openPrivateChannel()

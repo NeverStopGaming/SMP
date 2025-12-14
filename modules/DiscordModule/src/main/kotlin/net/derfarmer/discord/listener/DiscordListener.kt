@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import org.bukkit.Bukkit
 
 object DiscordListener : ListenerAdapter() {
 
@@ -16,14 +15,10 @@ object DiscordListener : ListenerAdapter() {
 
     override fun onMessageReceived(event: MessageReceivedEvent) {
         if (!event.isFromGuild && event.author.isBot) return
-        val whitelistChannel = event.guild.getTextChannelById(DiscordConfig.whitelistChannelID) ?: return
-        if (event.channel.id == whitelistChannel.id) return
+        if (event.channel.id != DiscordConfig.whitelistChannelID) return
 
         val message = event.message
-        if (Bukkit.getOfflinePlayer(message.contentRaw).name == null) {
-            DiscordManager.minecraftAccountNotFound(message)
-            return
-        }
+        //DiscordManager.minecraftAccountNotFound(message)
 
         message.addReaction(Emoji.fromUnicode(APPROVE_EMOJI)).queue()
         message.addReaction(Emoji.fromUnicode(DENY_EMOJI)).queue()
@@ -37,9 +32,11 @@ object DiscordListener : ListenerAdapter() {
 
         val emojiUnicode = event.reaction.emoji.asUnicode().name
 
+        val msg = event.retrieveMessage().complete()
+
         if (emojiUnicode == APPROVE_EMOJI) {
             removeReaction(event, DENY_EMOJI)
-            DiscordManager.acceptRequest(event.retrieveMessage().complete().contentRaw, member)
+            DiscordManager.acceptRequest(msg.contentRaw, msg.member!!)
         } else if (emojiUnicode == DENY_EMOJI) {
             removeReaction(event, APPROVE_EMOJI)
             DiscordManager.denyRequest(member)
