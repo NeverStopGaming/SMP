@@ -38,16 +38,17 @@ object FabricListener : Listener {
 
     @EventHandler
     fun onJoin(e: PlayerJoinEvent) {
-        if (!e.player.hasPlayedBefore()) {
-            e.player.inventory.setItem(8, questBook)
-            Bukkit.getOnlinePlayers().forEach { player ->
-                player.playSound(player.location, Sound.ENTITY_CHICKEN_EGG, 1.0f, 1.0f)
-            }
-        }
-
         PlayerModule.plugin.launch(PlayerModule.plugin.entityDispatcher(e.player)) {
             delay(1000 * 3)
             if (FabricManager.isFabricPlayer(e.player)) return@launch
+
+            if (!e.player.hasPlayedBefore()) {
+                e.player.inventory.setItem(8, questBook)
+                Bukkit.getOnlinePlayers().forEach { player ->
+                    player.playSound(player.location, Sound.ENTITY_CHICKEN_EGG, 1.0f, 1.0f)
+                }
+            }
+
             e.player.kick(Message.get("kick.modNotInstalled", withPrefix = false))
         }
     }
