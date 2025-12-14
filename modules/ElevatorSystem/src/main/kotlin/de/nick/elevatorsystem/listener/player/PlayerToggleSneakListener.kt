@@ -98,7 +98,7 @@ object PlayerToggleSneakListener : Listener {
         val holder = Launcher(dispenser, launcherLvl)
 
         if (launcherLvl == 100) {
-            triggerElytraBoost(player, 10.0)
+            triggerElytraBoostSpawn(player, 1.0)
             return
         }
 
@@ -169,4 +169,26 @@ object PlayerToggleSneakListener : Listener {
             player.isGliding = true
         }
     }
+
+    private fun triggerElytraBoostSpawn(player: Player, finalVelocityMultiplier: Double) {
+
+        GlobalScope.launch {
+            player.world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, player.location, 50, 0.1, 0.1, 0.1, 0.1)
+            player.world.spawnParticle(Particle.FLAME, player.location, 30, 0.1, 0.1, 0.1, 0.1)
+            player.playSound(player.location, Sound.ENTITY_WITHER_SHOOT, 20F, 10f)
+            PlayerFlyStart.fly.add(player)
+            player.velocity = Vector(0, 4, 0)
+
+            for (i in 3 downTo 0) {
+                delay(500)
+                player.showTitle(Title.title(Component.text("Boost in"), Component.text(i)))
+            }
+            player.showTitle(Title.title(Component.text(""), Component.text("")))
+
+            player.world.spawnParticle(Particle.FIREWORK, player.location, 180, 0.1, 0.1, 0.1, 0.1)
+            player.velocity = player.eyeLocation.direction.multiply(finalVelocityMultiplier)
+            player.isGliding = true
+        }
+    }
+
 }
