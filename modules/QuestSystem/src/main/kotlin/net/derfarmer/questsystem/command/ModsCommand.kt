@@ -24,7 +24,7 @@ object ModsCommand : Command("mods") {
             return
         }
 
-        FabricManager.requestModes(player) { data ->
+        FabricManager.requestModes(target) { data ->
             val msg = data.split(";").joinToString { it.split("%%%")[0] }
             player.sendMSG("mods.player", target.name, msg)
         }
